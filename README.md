@@ -64,8 +64,6 @@ Our project aims to provide a rigorous benchmark for the zkML ecosystem, enablin
 <!-- > May intentionally add something that is the challenge in the current zkML frameworks -->
 
 
-
-
 # Plan Roadmap
 This section describes the development roadmap for our zkML benchmarking project. We've organized our work into three main milestones, corresponding to our primary deliverables: research the current landscape, benchmarking, and documentation. 
 
@@ -76,114 +74,6 @@ This section describes the development roadmap for our zkML benchmarking project
 * Starting Date: 30th Oct 2023
 * Total Costs: US$11,250
 * Cost Estimation: US$62.5/hour x 15 hours/week x 12 weeks
-
-
-## Milestone 1: Research Existing zkML Frameworks
-* Estimated Duration: 6 weeks
-* FTE: 0.375
-* Costs: US$5,625
-* Estimated delivery date: 10th December 2023
-
-**Deliverables and Specifications:**
-
-0b. **Documentation**:
-   * Draft a well-structured document detailing our research and survey process.
-   * Summarize each selected framework's environment setup.
-   * Record the basic test results for each.
-   * Highlight the pros and cons of each framework.
-
-0c. **Testing Guide**:
-   * Enumerate the methodologies used to test each framework.
-   * Discuss the hands-on benchmarking using the provided demos of the shortlisted frameworks.
-   * Detail the parameters and results for:
-     * Memory usage
-     * Proof generation time
-     * On-chain support
-     * Accuracy loss
-
-1. **Functionality: Preliminary Survey of zkML Landscape**:
-   * Conduct a broad review of the zkML ecosystem.
-   * Focus on the major categories, namely 'Model-to-proof Compilers' and 'zkML-specific Proving Systems'.
-   * Select a subset of these frameworks based on their GitHub stars, PR activity, utility, and representation for a more detailed analysis.
-
-2. **Functionality: Deep Dive into Chosen Frameworks**:
-   * Conduct a thorough review of the provided documentation for each selected framework.
-   * Engage actively with available demos, and if provided, the benchmarking tools.
-   * Identify and understand their unique features, especially with respect to advantages in handling specific ML models or showcasing scalability.
-
-
-
-## Milestone 2: Design the Benchmark and Evaluation
-
-* **Estimated Duration**: 4 weeks
-* **FTE**: 0.375
-* **Costs**: US$3,750
-* **Estimated Delivery Date**: 7th Jan 2024
-
-**Deliverables and Specifications:**
-
-0b. **Documentation**:
-   * Develop a thorough document detailing the benchmarking and evaluation methodology.
-   * Present the criteria deduced from Milestone 1 research for benchmarking, with the rationale for each criterion.
-   * Describe the techniques adopted for evaluating each framework, focusing on transparency and reproducibility.
-
-0c. **Benchmarking Guide**:
-   * Craft a guide that describes how to run the benchmarks, including the necessary software prerequisites and configurations.
-   * Present guidelines for interpreting the results, concentrating on areas like:
-     * Proving & verification times
-     * Proof sizes
-     * Comparative performance across varied use cases
-     * Support for hardware acceleration
-     * Cost factors (e.g., gas/fee) when integrating into blockchain platforms
-
-1. **Functionality: Extracting Benchmark Criteria**:
-   * Review findings from Milestone 1 to distill essential benchmarking criteria.
-   * Identify key performance indicators, features, or attributes that distinguish each framework. 
-   * Determine which of these can be standardized across all frameworks for a balanced comparison.
-
-2. **Functionality: zkML-specific Benchmarks**:
-   * Devise specific benchmark tests that:
-     * Evaluate performance implications linked with different ML model sizes.
-     * Measure inference accuracy loss in zkML frameworks.
-     * Understand computational and memory overheads when converting ML models.
-     * Test framework compatibility with prevalent ML toolchains or libraries.
-   * Design scenarios and use cases that reflect real-world applications and challenges, ensuring a balanced and comprehensive evaluation.
-
-3. **Evaluation**:
-   * Implement the benchmarking tests on the chosen zkML frameworks.
-   * Gather, scrutinize, and interpret the results to furnish a holistic comparative analysis.
-   * Spotlight strengths, limitations, and unique features of each zkML framework as per the benchmarks.
-   * Deliver insights and recommendations based on the evaluations to assist developers in selecting the best-fit zkML framework for their projects.
-
-
-## Milestone 3: Comprehensive Documentation
-
-* **Estimated Duration**: 2 weeks
-* **FTE**: 0.375
-* **Costs**: US$1,875
-* **Estimated Delivery Date**: 4th Feb 2024 (2-week break early Jan)
-
-**Deliverables and Specifications:**
-
-0b. **Documentation Overview**:
-   * Project introduction, objectives, and recap of previous milestones.
-
-0c. **User Guide**:
-   * Step-by-step guide to navigate and utilize benchmark results, with best practices for zkML projects.
-
-1. **Benchmark Summary**:
-   * Comparative analysis tables and charts of zkML frameworks.
-   * Commentaries on strengths, limitations, and use cases.
-
-2. **Technical Insights**:
-   * Challenges, innovations, and zkML-specific concerns observed.
-
-3. **Best Practices & Recommendations**:
-   * Guidelines for framework selection, challenges mitigation, and future research suggestions.
-   * Discussion on potential future work and areas for the benchmark's expansion.
-
-4. **Appendices**:
-   * Supplementary materials: methodology, glossary, and any tools used.
 
 
 
