@@ -29,7 +29,7 @@ template Bits4(){
     signal bits[4];
     var bitsum = 0;
     for (var i = 0; i < 4; i ++){
-        bits[i] <-- (in >> i) & i;
+        bits[i] <-- (in >> i) & 1;
         bits[i] * (bits[i] - 1) === 0;
         bitsum = bitsum + 2 ** i * bits[i];
     }
