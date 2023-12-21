@@ -27,6 +27,7 @@ Even various of proving systems have been introduced in recent years, and each o
   - **Supranational:** Offers GPU acceleration solutions.
   - **Accseal:** Develops ASIC chips for ZKP hardware acceleration.
   - **Icicle:**
+  - **Ingonyama:**
 
 - Application: Design for zkML use cases
   - **ZKP Neural Networks:** *evalutation of neural networks inside zero knowledge proofs*
