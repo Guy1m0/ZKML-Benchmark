@@ -5,22 +5,21 @@
 As machine learning gains attention globally, ensuring the integrity and authenticity of machine learning models, particularly in Machine Learning as a Service (MLaaS), has become crucial. Zero-knowledge Machine Learning (zkML), and specifically zk-SNARK, emerges as a key player in bridging the trust gap, ensuring both computational integrity and data privacy. This project aims to develop a zkML benchmarking tool to guide developers through the complexities of the zkML landscape, focusing on the inference phase of ML models due to the high computational demands of the training phase.
 
 ## Current Landscape
-Even various of proving systems have been introduced in recent years, and each of them is proved to be practical in certain application scenarieno and advanced in no trusted-setup, proving efficiency, deterministic proof size etc. However, naively converting a ML model to an arithmetic circuit is not feasible all the time, since the computation might be quite taxing for millions of paramters used in NN model. Therefore, many research works and framework have been proposed to fix this issues. The landscape can be categorized into several key areas:
+Even various of proving systems have been introduced in recent years, and each of them is proved to be practical in certain application scenarieno and advanced in no trusted-setup, proving efficiency, deterministic proof size etc. However, naively converting a ML model to an arithmetic circuit is not feasible all the time, since the computation might be quite taxing for millions of paramters used in NN model. Therefore, many research works and industrial frameworks have been proposed to fix this issue. The landscape can be categorized into several key areas:
 
 - Model-to-Proof Compilers: Convert conventional ML model from a common format (e.g. ONNX, Keras, etc) into a verifiable computational circuit
-  - **EZKL:** Converts ONNX models into zk-SNARK circuits.
-  - **Orion:** 
-  - **Circomlib-ml:** Transpiles Keras models into Circom circuits.
-  - **Tachikoma&Uchikoma:** Bridges Apache TVM to arithmetic circuits in ZKP systems.
-  - **Daniel Kang's zkml:** Constructs proofs of ML model execution in zk-SNARKs.
-    - tflight?
+  - **EZKL:** A library and command-line tool that converts ONNX models into zk-SNARK circuits.
+  - **Orion:** Generates Validity ML that enables the verification of the inference by leveraging Cario and ONNX's capabilities.
+  - **keras2circom&Circomlib-ml:** A python tool that transpiles Keras models into Circom circuits.
+  - **LinearA:** A framework bridges Apache TVM to arithmetic circuits in ZKP systems.
+  - **Daniel Kang's zkml:** Constructs proofs of ML model execution in Halo2.
 
 - zkML-Specific Proving Systems: Generate efficient verification of ML models with circuit-unfriendly operations
   - **zkCNN:** A novel approach for verifying convolutional neural networks.
   - **Zator:** Utilizes recursive zk-SNARKs for deep neural network verification.
-  - **ZeroGravity:** *A system for proving an inference run (i.e. a classification) for a pre-trained, public WNN and a private input.*
-    - [intro](https://hackmd.io/@benjaminwilson/zero-gravity)
+  - **ZeroGravity:** A system for proving an inference run for a pre-trained, public WNN and a private input.
 
+> [intro](https://hackmd.io/@benjaminwilson/zero-gravity)
 
 - Hardware Acceleration: Build specialized hardware to support proof generation
   - **Supranational:** Offers GPU acceleration solutions.
@@ -32,8 +31,8 @@ Even various of proving systems have been introduced in recent years, and each o
   - **ZKP Neural Networks:** *evalutation of neural networks inside zero knowledge proofs*
   - **Worldcoin:** Integrates zkML for a privacy-preserving proof of personhood protocol.
   - **ZKaptcha:** Enhances captcha services by analyzing user behaviors through zkML.
-  - **ZKaggle:** *Bounty platform for hosting, verifying, and paying out bounties*
-  - **RockyBot:** *On-chain verifiable ML trading bot*
+  - **ZKaggle:** Bounty platform for hosting, verifying, and paying out bounties
+  - **RockyBot:** On-chain verifiable ML trading bot
 
 ### Proving System
 
