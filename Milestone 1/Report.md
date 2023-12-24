@@ -19,84 +19,49 @@ Even various of proving systems have been introduced in recent years, and each o
   - **Zator:** Utilizes recursive zk-SNARKs for deep neural network verification.
   - **ZeroGravity:** A system for proving an inference run for a pre-trained, public WNN and a private input.
 
-> [intro](https://hackmd.io/@benjaminwilson/zero-gravity)
 
 - Hardware Acceleration: Build specialized hardware to support proof generation
   - **Supranational:** Offers GPU acceleration solutions.
   - **Accseal:** Develops ASIC chips for ZKP hardware acceleration.
-  - **Icicle:**
-  - **Ingonyama:**
+  - **Icicle:** A CUDA implementation of general functions used in zero-knowledge proof.
 
 - Application: Design for zkML use cases
-  - **ZKP Neural Networks:** *evalutation of neural networks inside zero knowledge proofs*
+  <!-- - **ZKP Neural Networks:** *evalutation of neural networks inside zero knowledge proofs* -->
   - **Worldcoin:** Integrates zkML for a privacy-preserving proof of personhood protocol.
   - **ZKaptcha:** Enhances captcha services by analyzing user behaviors through zkML.
   - **ZKaggle:** Bounty platform for hosting, verifying, and paying out bounties
-  - **RockyBot:** On-chain verifiable ML trading bot
+  - **RockyBot:** On-chain verifiable ML trading bot.
 
 ### Proving System
 
-#### The Cost of Intelligence
+Generalized proving system, like Plonkish, STARK, R1CS and GKR, is the backend of abovementioned zkML frameworks and also the main enabler in bringing zkML to realization. However, the advancement of verifiable ML is hindered by non-arithmetic operations, notably activitaion functions such as ReLU. For this reason, plonkish-based proving system, like Halo2 and Plonky2, tends to be the most popular backends for zkML, since the table-style arithmetization schemem can handle neural network non-linearities well via lookup arguments. However, such lookup table sacrifice the useability as it coming with a notable cost of prover memory consumption. With respect to the performance metric, other proof systems have their own benefits as well. For example, R1CS-based proof sytesm is outstanding for its small proof sizes and GKR-based appears best suited to tackle large models. While improvements and optimizations are being made in new proof system these years, accuracy loss generated during quantization is prevailed in almost all the systems.
 
-This was conducted on roughly equal terms, using two consistent benchmark suites. Concretely,
+Taken together, it's essential to highlight the main challenges of compiling neural networks to ZKP systems:
 
-we create circuits representing MLPs (multi-layer perceptrons) within each proof system and run the prover, measuring specifically **the wall clock time of creating a proof of inference**, as well as **the maximum prover memory consumption** during the proof generation process.
+1. **Floating Point in ZKP:** Neural networks are often trained using floating point numbers. In zkML, this brings about the challenge of quantizing these numbers into fixed-point representations, without significant accuracy loss.
+2. **Compatibility:** ZKP systems aren't inherently compatible with the complex operations (e.g. activitation function, matrix multiplication, etc) commonly used in neural networks. 
+3. **Performance:** Crafting ZKP for ML models is a delicate act of balancing various trade-offs. Researchers must consider memory usage, proof size, and prover time to ensure optimal performance.
 
-On the zero-knowledge prover side, we test Groth16, Gemini, Winterfell (via
-Cairo VM implementation), Halo2, Plonky2, and zkCNN. In particular, we showcase comparisons of proof time and memory consumption between the aforementioned proof systems, examining bottlenecks as each system scales with increasingly large and deep MLPs.
+Therefore, some progress has been made in designing zkML-Specific proving systems to optimize the proof for the advanced ML models, including zkCNN, vCNN, and pvCNN. As the these names suggest, they are optimized for CNN models, and thus can only be applied to certain CV tasks, such as MNIST or CIFAR-10. 
 
-* R1CS-based Proof
-  * Groth16: small proof size
-  * Gemini: handle extremely large circuits
-- STARK-based Proof
-  - Winterfell: open-source STARK VM-based prover
-- Plonkish Proof
-  - Halo2: Sophisticted developer tooling and flexibility
-  - Plonky2: FRI to Plonkish constraints
-- GKR-based Proof
-  - zkCNN: efficient proof imple using novel tech to handle circuit-unfriendly NN op
+In short, no exisitng proving systems is good enough to address these challenges and handle various ML tasks. This situation also applies to the zkML framework. This is why we need this benchamrk to provide a rigorous benchmark for the zkML ecosystem, enabling developers to make informed decisions based on empirical evidence. 
 
-
-
-In so doing, it becomes clear that with respect to proving time, Plonky2 is by far the most performant system thanks to its use of FRI-based polynomial commitments and the Goldilocks field. In fact, for our largest benchmarked architectures it is 5 times faster than Halo2, another popular general ZK proof system. This, however, comes at the notable cost of prover memory consumption, where Plonky2 consistently performs worse, at times doubling Halo2’s peak RAM usage. With respect to both proving time and memory, the GKR-based zkCNN prover appears best suited to tackle large models – even without an optimized implementation.
-
-something like
-> Plonkish proof systems tend to be the most popular backends for zkML for this reason. Halo2 and Plonky2 with their table-style arithmetization scheme can handle neural network non-linearities well via lookup arguments. In addition, the former has a vibrant developer tooling ecosystem coupled with flexibility, making it the de facto backend for many projects including EZKL.
-
-> Other proof systems have their benefits as well. R1CS-based proof systems include Groth16 for its small proof sizes and Gemini for its handling of extremely large circuits and linear time prover. STARK-based systems like the Winterfell prover/verifier library are also useful especially when implemented via Giza’s tooling that takes a Cairo program’s trace as an input and generates a STARK proof using Winterfell to attest to the correctness of the output.
 
 ### Shortlisted Project
 
 Because of time limitation, we only benchmark a shortlisted zkml projects to perform a comparison with respect to **A, B, C, and D**. It is worth noting that these selected projects certainly can not represent the comprehensive view of the current landscape. After closely examining almost all the exisitng open-sourced zkml projects, we try to find best examplers to represent the trends of zkml framework through a subset of these frameworks based on their **Github stars**, **PR activity**, **utility**, and **proof system**. We believe there must be few outstanding frameworks not be included this time, and promise to update the benchmark results in response to new coming ones. 
 
-A basic comprision table is provided as follows.
+A basic information of shortlisted frameworks is provided as follows.
 
 
+| Name         | Model Format | Star | Proof System |  Link |
+| ---------    | ------------ | ---- | ------------ | -------|
+| EZKL         |     ONNX     | 713  |   Halo 2 *   | [GitHub Repo](https://github.com/zkonduit/ezkl) |
+| Orion        |     ONNX     | 132  |   ZK-STARK   | [GitHub Repo](https://github.com/gizatechxyz/orion) |
+| DDKang ZKML  |   TFLite     | 314  |   Halo 2     | [GitHub Repo](https://github.com/ddkang/zkml) |
+| keras2circom |   tf.keras   | 69   | R1CS Groth16   | [GitHub Repo](https://github.com/socathie/keras2circom) | 
+| opML         |  ONNX (WiP)* | 65   | Fraud Proof***| [GitHub Repo](https://github.com/hyperoracle/opml) |
 
-> create a table for each selected project in name, repo link, proving system, support, special feature
-
-> Created on 22 Dec
-
-| Name         | Model Format | Star | Last Update | Proof System |
-| ---------    | ------------ | ---- | ----------- | ------------ |
-| EZKL         |     ONNX     | 713  |  22 Dec     |   Halo 2 #   |
-| Orion        |     ONNX (TFLite?)    | 132  |  21 Dec     |   ZK-STARK   |
-| DDKang ZKML  |   TFLite     | 314  |  11 Aug     |   Halo 2     |
-| keras2circom |   tf.keras   | 69   |  26 Nov     |   R1CS Groth16   |
-| opML         |  ONNX (WiP)* | 65   |  23 Oct     | Fraud Proof**|
-
-
-### Codebases
-However, since not all of listed above project are 
-#### Active Projects
-   - **EZKL:** [GitHub Repo](https://github.com/zkonduit/ezkl) - Utilizes Halo2, supports ONNX.
-   - **Orion:** [GitHub Repo](https://github.com/gizatechxyz/orion) - Based on STARKs, supports ONNX and TFLite models.
-   - **DDKang ZKML:** [GitHub Repo](https://github.com/ddkang/zkml) - Utilizes Halo2  supports TFLite models.
-   - **opML:** [GitHub Repo](https://github.com/hyperoracle/opml) - Currently working on ONNX support.
-   - **circomlib-ml:** [GitHub Repo](https://github.com/socathie/circomlib-ml) - Likely based on Stark, supports TFLite models with Circom and SnarkJS.
-
-#### Inactive Projects
-   - **Zator, 0g, proto-neural-zkp:** [Various Repos] - Show less recent activity but contribute to the field's development.
 
 ## Benchmark Methodology
 
@@ -115,3 +80,5 @@ ZK Score, as detailed in [this reference](https://medium.com/@ingonyama/zk-score
 
 
 
+
+> Discuss how the proving system will infect the prover time, memory size, etc. Then make conclusion that, directly compare these may not be fair cross different proving system. Instead, i will mark the difference, list pros and cons, leave the reader to decide which one is the best fit.

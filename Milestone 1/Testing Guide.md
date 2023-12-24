@@ -8,8 +8,16 @@
 
 ## Benchmark
 
-1. Proving System: Mem, Time, Cost etc
+1. Proving System: Mem <-> Time, Cost etc
 2. Generalized & Specilized 
 3. Support: Committe Active, Documentation, Requirements (OS, Knowledge etc)
+4. Increasing parameter count/number of layer
+
+Use case:
+1. MNIST
+2. CIFAR10
+3. 
+
+CNN, RNN, Transform? 
 
 ## Benchmarking Methodology
