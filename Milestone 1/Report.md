@@ -39,12 +39,9 @@ Many research works and industrial frameworks have been proposed to convert an M
 
 ### Proving System
 
-Despite the introduction of various proving systems in recent years, each excelling in specific applications and advancements in non-trusted-setup, proving efficiency, and deterministic proof size, the naive conversion of an ML model into an arithmetic circuit is not always feasible.
+<!-- Despite the introduction of various proving systems in recent years, each excelling in specific applications and advancements in non-trusted-setup, proving efficiency, and deterministic proof size, the naive conversion of an ML model into an arithmetic circuit is not always feasible. -->
 
-Generalized proving system like Plonkish, STARK, R1CS and GKR are the backbone of the aforementioned zkML frameworks and crucial for realizing zkML. However, the naive conversion of an ML model into an arithmetic circuit is not always feasible.
-
-
-For example, the advancement of verifiable ML is hindered by non-arithmetic operations, notably activitaion functions such as ReLU, sigmoid,and tanh. Plonkish-based systems, such as Halo2 and Plonky2, are popular due to their table-style arithmetization schemes that handle neural network non-linearities efficiently through lookup arguments. Yet, these lookups come with notable prover memory consumption costs. In terms of performance, other systems like R1CS excel in small proof sizes, and GKR-based systems seem best suited for large models. Despite the introduction of various proving systems in recent years, each excelling in specific applications and advancements in non-trusted-setup, proving efficiency, and deterministic proof size, almost all systems face accuracy loss during quantization.
+Generalized proving system like Plonkish, STARK, R1CS and GKR are the backbone of the aforementioned zkML frameworks and crucial for realizing zkML. However, the naive conversion of an ML model into an arithmetic circuit is not always feasible. For example, the advancement of verifiable ML is hindered by non-arithmetic operations, notably activitaion functions such as ReLU, sigmoid,and tanh. Plonkish-based systems, such as Halo2 and Plonky2, are popular due to their table-style arithmetization schemes that handle neural network non-linearities efficiently through lookup arguments. Yet, these lookups come with notable prover memory consumption costs. In terms of performance, other systems like R1CS excel in small proof sizes, and GKR-based systems seem best suited for large models. Despite the introduction of various proving systems in recent years, each excelling in specific applications and advancements in non-trusted-setup, proving efficiency, and deterministic proof size, almost all systems face accuracy loss during quantization.
 
 Taken together, it's essential to highlight the main challenges of compiling neural networks to ZKP systems:
 
@@ -59,7 +56,7 @@ In summary, no exisitng proving systems sufficiently addresses these challenges 
 
 ### Shortlisted Project
 
-Due to time constraints, we benchmark a shortlisted selection of zkML projects to compare aspects such as **A, B, C, and D**. This selection does not represent the entire landscape but aims to exemplify current trends through a subset of frameworks. We plan to update the benchmark results in response to emerging frameworks.
+Due to time constraints, we benchmark a shortlisted selection of zkML projects to compare aspects such as proof generation time, prover memory usage, and framework compatibility. This selection does not represent the entire landscape but aims to exemplify current trends through a subset of frameworks. We plan to update the benchmark results in response to emerging frameworks.
 
 <!-- Basic Information of Shortlisted Frameworks
 
@@ -76,11 +73,11 @@ A basic information of shortlisted frameworks is provided as follows.
 | keras2circom |   tf.keras   | 69   | R1CS Groth16   | [GitHub Repo](https://github.com/socathie/keras2circom) | 
 | opML         |  ONNX (WiP)* | 65   | Fraud Proof***| [GitHub Repo](https://github.com/hyperoracle/opml) |
 
-Halo2*: EZKL customs halo2 circuits through aggregation proofs and recursion and optimizes the conversion using fusion and abstraction.
+Halo2*: EZKL customs halo2 circuits through aggregation proofs and recursion, and optimizes the conversion using fusion and abstraction.
 
 ONNX(WiP)**: Work in Progress
 
-Fraud Proof***: Instead a traditional zk proofs to prove the validity of computation, opML provide an any-trust guarantee using the fraud proof system that any honest validator can force opML to behave correctly
+Fraud Proof***: Instead a traditional zk proofs to prove the validity of computation, opML provides an any-trust guarantee using the fraud proof system that any honest validator can force opML to behave correctly
 
 ## Benchmark Methodology
 
@@ -110,22 +107,31 @@ The primary metrics for benchmarking include:
 ### Planned Benchmarking Tasks
 Our benchmarking methodology includes tasks on two computer vision (CV) datasets - MNIST and CIFAR10 - to evaluate the frameworks under different levels of complexity:
 
-1. MNIST Dataset:
-  - Simplicity of the Task: MNIST, being a dataset of handwritten digits, represents a less complex task, suitable for evaluating the basic capabilities of zkML frameworks.
-  - Framework Assessment: We will observe how each framework handles relatively simple image data and whether it can maintain accuracy and efficiency.
-2. CIFAR10 Dataset:
-  - Increased Complexity: CIFAR10, with its more complex image data (like animals, vehicles, etc.), increases the challenge for zkML frameworks.
-  - Parameter Variation: We will test the frameworks on this dataset with an increasing number of parameters and layers, pushing the boundaries of each framework's capacity.
-  - Accuracy Loss Measurement: If applicable, we will measure and compare the accuracy loss across different frameworks, providing insight into their robustness and fidelity in more complex tasks.
+1. **MNIST Dataset:**
+      - Simplicity of the Task: MNIST, being a dataset of handwritten digits, represents a less complex task, suitable for evaluating the basic capabilities of zkML frameworks.
+      - Framework Assessment: We will observe how each framework handles relatively simple image data and whether it can maintain accuracy and efficiency.
+2. **CIFAR10 Dataset:**
+    - Increased Complexity: CIFAR10, with its more complex image data (like animals, vehicles, etc.), increases the challenge for zkML frameworks.
+    - Parameter Variation: We will test the frameworks on this dataset with an increasing number of parameters and layers, pushing the boundaries of each framework's capacity.
+    - Accuracy Loss Measurement: If applicable, we will measure and compare the accuracy loss across different frameworks, providing insight into their robustness and fidelity in more complex tasks.
 
 ### Benchmarking Process
 
-1. **Circuit Design for MLPs:** For each zkML framework, we design circuits that represent Multi-Layer Perceptrons (MLPs), focusing on typical structures used in ML models.
-2. **Uniform Testing Conditions:** To ensure fairness, the same benchmark suites are used across all frameworks. These suites include a consistent set of MLP architectures, varying in parameters, FLOPs, and number of layers.
-3. **Encoding MLPs:** Each framework’s unique approach to encoding MLPs is critically analyzed. This involves understanding how each proof system converts ML operations into its respective arithmetization scheme.
-4. **Exclusion of Pre-Processing Steps:** Measurements focus solely on the proof generation phase, deliberately excluding pre-processing or witness generation steps.
-5. **Highlight Differences**:Clearly mark the differences in performance and capabilities across various proving systems. This includes detailing how each system performs under different benchmarking tasks and conditions.
-6. **List Pros and Cons**: Provide a comprehensive list of advantages and disadvantages for each framework and its associated proving system. This helps in understanding the suitability of each framework for specific applications.
+The benchmarking process for evaluating zkML frameworks is structured to provide a comprehensive analysis of their performance across various metrics. Here’s an expanded breakdown of the steps involved:
+
+1. **Circuit Design for MLPs:** For each zkML framework, we design circuits representing Multi-Layer Perceptrons (MLPs), focusing on structures typically used in machine learning models. These circuits are tailored to each framework's specifications and capabilities.
+
+2. **Uniform Testing Conditions:** We employ the same benchmark suites across all frameworks to ensure consistent and fair testing conditions. These suites include MLP architectures with varying parameters, FLOPs, and number of layers, providing a uniform basis for comparison.
+3. **Encoding MLPs:** Each framework's unique approach to encoding MLPs is critically examined. This involves understanding how each proof system translates machine learning operations into its respective arithmetization scheme.
+4. **Exclusion of Pre-Processing Steps:** Our measurements concentrate exclusively on the proof generation phase, deliberately omitting pre-processing or witness generation steps to maintain a focused evaluation of proof generation efficiency.
+5. **Modifying MLP Structures:** To assess scalability and robustness, we systematically modify the MLP structures within each framework by increasing the number of parameters and layers. This alteration simulates more complex ML models and highlights each framework’s adaptability and performance under escalated complexity.
+6. **Comparative Performance Analysis:** We compare the performance of each framework under modified conditions. This includes analyzing how changes in MLP structures impact key metrics like proof generation time and memory usage.
+7. **Highlight Differences:** Clear distinctions in performance and capabilities across various proving systems are marked. This includes detailed information on how each system responds to different benchmarking tasks and conditions, including those with modified MLP structures.
+8. **List Pros and Cons:** A comprehensive list of the advantages and disadvantages for each framework and its associated proving system is provided. This helps in understanding the suitability of each framework for specific types of ML models, particularly as complexity increases.
+
+9. **Framework-Specific Feature Evaluation:** Any unique or specialized features of each framework, such as specialized circuit designs or optimizations for particular types of ML models, are evaluated. This helps in understanding how these features contribute to the overall performance and utility of the framework.
+
+Through this detailed benchmarking process, we aim to provide a nuanced understanding of each zkML framework’s capabilities, especially in handling increasingly complex machine learning models. This approach will guide users in selecting the most suitable framework for their specific requirements in the realm of zkML.
 
 ### Other Consideration
 
