@@ -1,0 +1,5 @@
+ezkl==7.1.4
+torch==2.1.2
+scikit-learn==1.4.0
+sk2torch==1.2.0
+onnx=1.15.0
