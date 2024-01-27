@@ -1,7 +1,7 @@
 # MNIST
 model design
 
-## Orion
+## Orion (TF)
 
 ### Data types
 
@@ -33,7 +33,7 @@ Orion supports currently these `NN` types.
 | [`nn.thresholded_relu`](nn.thresholded\_relu.md) | Performs the thresholded relu activation function element-wise. |
 | [`nn.gemm`](nn.gemm.md) | Performs General Matrix multiplication. |
 
-## Keras2circom
+## Keras2circom (TF)
 
 supported_ops = [
     'Activation',
@@ -49,7 +49,7 @@ supported_ops = [
     'Softmax',
 ]
 
-## DDKang
+## DDKang (TF)
 
 1. Conv2D
 2. BatchNormalization
@@ -60,6 +60,8 @@ supported_ops = [
 7. softmax
 
 
+## OPML (PT)
+
 # Model Design
 
-Start from very basic NN model, even not a CNN (for Orion framework)
+Start from DNN to include Orion and OPML, then move to CNN for testing ezkl, k2c and ddk
