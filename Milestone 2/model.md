@@ -32,3 +32,34 @@ Orion supports currently these `NN` types.
 | [`nn.hard_sigmoid`](nn.hard\_sigmoid.md) | Applies the Hard Sigmoid function to an n-dimensional input tensor. |
 | [`nn.thresholded_relu`](nn.thresholded\_relu.md) | Performs the thresholded relu activation function element-wise. |
 | [`nn.gemm`](nn.gemm.md) | Performs General Matrix multiplication. |
+
+## Keras2circom
+
+supported_ops = [
+    'Activation',
+    'AveragePooling2D',
+    'BatchNormalization',
+    'Conv2D',
+    'Dense',
+    'Flatten',
+    'GlobalAveragePooling2D',
+    'GlobalMaxPooling2D',
+    'MaxPooling2D',
+    'ReLU',
+    'Softmax',
+]
+
+## DDKang
+
+1. Conv2D
+2. BatchNormalization
+3. AvgPool2D
+4. relu
+5. Flatten
+6. Dense
+7. softmax
+
+
+# Model Design
+
+Start from very basic NN model, even not a CNN (for Orion framework)
