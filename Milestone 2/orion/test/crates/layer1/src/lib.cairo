@@ -1,1 +1,2 @@
+mod bias;
 mod weights;
