@@ -10,6 +10,12 @@ tensorflow==2.15.0
 onnx-tf==1.10.0
 cuda-python==12.3.0
 matplotlib==3.8.2
+
+# orion
 #tf2onnx=1.16.1
 #giza-cli==0.7.0
+tensorflow_model_optimization==0.7.5
 
+# Hyper Oracl
+rangetree==1.0
+pyelftools==0.27
