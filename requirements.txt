@@ -24,3 +24,7 @@ psutil == 5.98
 
 # socathie
 docopt == 0.6.2
+
+# ddkang
+tflite == 2.10.0
+msgpack = 1.0.7
