@@ -31,7 +31,7 @@ template dnn() {
         }
     }
 
-    for (var i=0; i<25; i++) {
+    for (var i=0; i<10; i++) {
         Dense32.bias[i] <== 0;
         Dense32.out[i] <== Dense32out[i];
         Dense32.remainder[i] <== Dense32remainder[i];

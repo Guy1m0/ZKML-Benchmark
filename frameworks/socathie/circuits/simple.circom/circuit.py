@@ -26,16 +26,13 @@ def inference(input, circuit):
     out = input['in']
     output = {}
     
-    out, remainder = DenseInt(25, 10, 10**18, out, circuit['dense_34_weights'], circuit['dense_34_bias'])
-    output['dense_34_out'] = out
-    output['dense_34_remainder'] = remainder
+    out, remainder = DenseInt(25, 10, 10**18, out, circuit['dense_64_weights'], circuit['dense_64_bias'])
+    output['dense_64_out'] = out
+    output['dense_64_remainder'] = remainder
 
-    out, remainder = DenseInt(10, 2, 10**18, out, circuit['dense_35_weights'], circuit['dense_35_bias'])
-    output['dense_35_out'] = out
-    output['dense_35_remainder'] = remainder
-
-    out = ArgMaxInt(out)
-    output['softmax_13_out'] = out
+    out, remainder = DenseInt(10, 4, 10**18, out, circuit['dense_65_weights'], circuit['dense_65_bias'])
+    output['dense_65_out'] = out
+    output['dense_65_remainder'] = remainder
 
 
     return out, output
