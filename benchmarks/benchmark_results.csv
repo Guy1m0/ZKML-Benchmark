@@ -1,2 +1,3 @@
 Framework,Architecture,# Layers,# Parameters,Testing Size,Accuracy Loss (%),Avg Memory Usage (MB),Std Memory Usage,Avg Proving Time (s),Std Proving Time
-opml (pytorch),Input-Dense-Dense (784 * 56 * 10),3,44543,250,0.4,88.99809375,2.2855791829856638,3.655121666908264,0.4401261911437399
+opml (pytorch),Input-Dense-Dense (784 * 56 * 10),3,44543,250,0.4,88.99809375,2.285579182985664,3.655121666908264,0.4401261911437399
+opml (pytorch),"Input-Dense-Dense (784 * 56 * 10, w/ relu)",3,44543,1000,20.9,89.122078125,2.2478460201783403,3.664727106809616,0.4339211161472094

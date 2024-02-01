@@ -49,6 +49,9 @@ supported_ops = [
     'Softmax',
 ]
 
+
+* ReLU not support as activition for Dense
+
 ### DDKang (TF)
 
 1. Conv2D
@@ -64,6 +67,13 @@ supported_ops = [
 In theory all, but actually only few for DNN
 
 
+## Model Format
+
+opml: pytorch -> pth
+socathie: tensorflow -> h5
+orion: tensorflow -> tflite (tensorflow_model_optimization)
+ddkang: tensoflow -> tflite
+ezkl: pytorch -> pth
 
 # Model Design
 
