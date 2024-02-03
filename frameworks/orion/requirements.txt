@@ -1,0 +1,5 @@
+# orion
+giza-cli==0.9.0
+onnx==1.14.1
+torch==2.1.0
+torchvision==0.16.0
