@@ -1,4 +1,4 @@
-ezkl==7.1.4
+ezkl==8.0.1
 #nvidia-cublas-cu12==12.1.3.1
 torch==2.1.0
 torchvision==0.16.0
@@ -12,11 +12,6 @@ tensorflow==2.15.0
 matplotlib==3.8.2
 
 pandas == 2.2.0
-
-# orion
-#tf2onnx=1.16.1
-#giza-cli==0.7.0
-tensorflow_model_optimization==0.7.5
 
 # Hyper Oracl
 rangetree==1.0
