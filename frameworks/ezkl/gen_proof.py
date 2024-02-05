@@ -4,7 +4,7 @@ import json
 import numpy as np
 import argparse
 
-def gen_proof(output_folder, data_path , model_path):
+def gen_proof(output_folder, data_path , model_path, mode = "resources"):
     compiled_model_path = os.path.join(output_folder, 'network.compiled')
     settings_path = os.path.join(output_folder, 'settings.json') 
     witness_path = os.path.join(output_folder, 'witness.json')
@@ -22,7 +22,7 @@ def gen_proof(output_folder, data_path , model_path):
 
     res = ezkl.gen_settings(model_path, settings_path, py_run_args=run_args)
     assert res == True
-    res = ezkl.calibrate_settings(data_path, model_path, settings_path, "resources", scales=[2,7])
+    res = ezkl.calibrate_settings(data_path, model_path, settings_path, mode, scales=[2,7])
     assert res == True
 
     res = ezkl.compile_circuit(model_path, compiled_model_path, settings_path)
@@ -82,9 +82,10 @@ if __name__ == "__main__":
     parser.add_argument('--output', type=str, required=True, help='Output folder path')
     parser.add_argument('--data', type=str, required=True, help='Data file path')
     parser.add_argument('--model', type=str, required=True, help='Model file path')
+    parser.add_argument('--mode', type=str, required=False, help='Model file path')
 
     args = parser.parse_args()
 
-    pred = gen_proof(args.output, args.data, args.model)
+    pred = gen_proof(args.output, args.data, args.model, args.mode)
     
     print(f"Prediction: {pred}")
