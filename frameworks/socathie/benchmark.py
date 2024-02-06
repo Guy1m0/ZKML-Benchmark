@@ -151,7 +151,123 @@ def dnn_datasets():
 
     return test_images_tf, test_images_tf_downsampled
 
-def prepare(layers):
+def Conv2DInt(nRows, nCols, nChannels, nFilters, kernelSize, strides, n, input, weights, bias):
+    Input = [[[str(input[i][j][k] % p) for k in range(nChannels)] for j in range(nCols)] for i in range(nRows)]
+    Weights = [[[[str(weights[i][j][k][l] % p) for l in range(nFilters)] for k in range(nChannels)] for j in range(kernelSize)] for i in range(kernelSize)]
+    Bias = [str(bias[i] % p) for i in range(nFilters)]
+    out = [[[0 for _ in range(nFilters)] for _ in range((nCols - kernelSize)//strides + 1)] for _ in range((nRows - kernelSize)//strides + 1)]
+    remainder = [[[None for _ in range(nFilters)] for _ in range((nCols - kernelSize)//strides + 1)] for _ in range((nRows - kernelSize)//strides + 1)]
+    for i in range((nRows - kernelSize)//strides + 1):
+        for j in range((nCols - kernelSize)//strides + 1):
+            for m in range(nFilters):
+                for k in range(nChannels):
+                    for x in range(kernelSize):
+                        for y in range(kernelSize):
+                            out[i][j][m] += input[i*strides+x][j*strides+y][k] * weights[x][y][k][m]
+                out[i][j][m] += bias[m]
+                remainder[i][j][m] = str(out[i][j][m] % n)
+                out[i][j][m] = str(out[i][j][m] // n % p)
+    return Input, Weights, Bias, out, remainder
+
+def AveragePooling2DInt (nRows, nCols, nChannels, poolSize, strides, input):
+    Input = [[[str(input[i][j][k] % p) for k in range(nChannels)] for j in range(nCols)] for i in range(nRows)]
+    out = [[[0 for _ in range(nChannels)] for _ in range((nCols-poolSize)//strides + 1)] for _ in range((nRows-poolSize)//strides + 1)]
+    remainder = [[[None for _ in range(nChannels)] for _ in range((nCols-poolSize)//strides + 1)] for _ in range((nRows-poolSize)//strides + 1)]
+    for i in range((nRows-poolSize)//strides + 1):
+        for j in range((nCols-poolSize)//strides + 1):
+            for k in range(nChannels):
+                for x in range(poolSize):
+                    for y in range(poolSize):
+                        out[i][j][k] += input[i*strides+x][j*strides+y][k]
+                remainder[i][j][k] = str(out[i][j][k] % poolSize**2 % p)
+                out[i][j][k] = str(out[i][j][k] // poolSize**2 % p)
+    return Input, out, remainder
+
+def prepare_input_json_cnn(X, layers, input_path):
+    kernal_size = layers[-1]
+    X_in = [[[int(X[i][j][0]*1e18)] for j in range(layers[0])] for i in range(layers[0])]
+    conv2d_1_weights = [[[[int(model.layers[1].weights[0][i][j][k][l]*1e18) for l in range(layers[1])] for k in range(1)] for j in range(kernal_size)] for i in range(kernal_size)]
+    conv2d_1_bias = [int(model.layers[1].weights[1][i]*1e36) for i in range(layers[1])]
+
+    X_in, conv2d_1_weights, conv2d_1_bias, conv2d_1_out, conv2d_1_remainder = Conv2DInt(layers[0], layers[0], 1, layers[1], kernal_size, 1, 10**18, X_in, conv2d_1_weights, conv2d_1_bias)
+
+    relu_1_in = [[[int(conv2d_1_out[i][j][k]) for k in range(5)] for j in range(12)] for i in range(12)]
+    relu_1_out = [[[str(relu_1_in[i][j][k]) if relu_1_in[i][j][k] < p//2 else 0 for k in range(5)] for j in range(12)] for i in range(12)]
+
+    avg2d_1_in = [[[int(relu_1_out[i][j][k]) for k in range(5)] for j in range(12)] for i in range(12)]
+
+    _, avg2d_1_out, avg2d_1_remainder = AveragePooling2DInt(12, 12, 5, 2, 2, avg2d_1_in)
+
+
+    conv2d_2_in = [[[int(avg2d_1_out[i][j][k]) for k in range(5)] for j in range(6)] for i in range(6)]
+    conv2d_2_weights = [[[[int(model.layers[4].weights[0][i][j][k][l]*1e18) for l in range(11)] for k in range(5)] for j in range(kernal_size)] for i in range(kernal_size)]
+    conv2d_2_bias = [int(model.layers[4].weights[1][i]*1e36) for i in range(11)]
+
+    _, conv2d_2_weights, conv2d_2_bias, conv2d_2_out, conv2d_2_remainder = Conv2DInt(6, 6, 5, 11, 3, 1, 10**18, conv2d_2_in, conv2d_2_weights, conv2d_2_bias)
+
+
+    relu_2_in = [[[int(conv2d_2_out[i][j][k]) for k in range(11)] for j in range(4)] for i in range(4)]
+    relu_2_out = [[[str(relu_2_in[i][j][k]) if relu_2_in[i][j][k] < p//2 else 0 for k in range(11)] for j in range(4)] for i in range(4)]
+
+
+    avg2d_2_in = [[[int(relu_2_out[i][j][k]) if int(relu_2_out[i][j][k]) < p//2 else int(relu_2_out[i][j][k]) - p for k in range(11)] for j in range(4)] for i in range(4)]
+
+    _, avg2d_2_out, avg2d_2_remainder = AveragePooling2DInt(4, 4, 11, 2, 2, avg2d_2_in)
+
+    flatten_out = [avg2d_2_out[i][j][k] for i in range(2) for j in range(2) for k in range(11)]
+
+    dense_in = [int(flatten_out[i]) if int(flatten_out[i]) < p//2 else int(flatten_out[i]) - p for i in range(44)]
+    dense_weights = [[int(model.layers[8].weights[0][i][j]*1e18) for j in range(80)] for i in range(44)]
+    dense_bias = [int(model.layers[8].weights[1][i]*1e36) for i in range(80)]
+
+    _, dense_weights, dense_bias, dense_out, dense_remainder = DenseInt(44, 80, 10**18, dense_in, dense_weights, dense_bias)
+
+    dense_1_weights = [[int(model.layers[10].weights[0][i][j]*1e18) for j in range(10)] for i in range(80)]
+    dense_1_bias = [int(model.layers[10].weights[1][i]*1e36) for i in range(10)]
+
+    re_lu_3_out = [dense_out[i] if int(dense_out[i]) < p//2 else 0 for i in range(80)]
+    dense_1_in = [int(re_lu_3_out[i]) for i in range(80)]
+
+    _, dense_1_weights, dense_1_bias, dense_1_out, dense_1_remainder = DenseInt(80, 10, 10**18, dense_1_in, dense_1_weights, dense_1_bias)
+
+    in_json = {
+        "in": X_in,
+        "conv2d_2_weights": conv2d_1_weights,
+        "conv2d_2_bias": conv2d_1_bias,
+        "conv2d_2_out": conv2d_1_out,
+        "conv2d_2_remainder": conv2d_1_remainder,
+        "re_lu_1_out": relu_1_out,
+        "average_pooling2d_1_out": avg2d_1_out,
+        "average_pooling2d_1_remainder": avg2d_1_remainder,
+        "conv2d_3_weights": conv2d_2_weights,
+        "conv2d_3_bias": conv2d_2_bias,
+        "conv2d_3_out": conv2d_2_out,
+        "conv2d_3_remainder": conv2d_2_remainder,
+        "re_lu_2_out": relu_2_out,
+        "average_pooling2d_2_out": avg2d_2_out,
+        "average_pooling2d_2_remainder": avg2d_2_remainder,
+        "flatten_out": flatten_out,
+        "dense_weights": dense_weights,
+        "dense_bias": dense_bias,
+        "dense_out": dense_out,
+        "dense_remainder": dense_remainder,
+        "re_lu_3_out":re_lu_3_out,
+        "dense_1_weights":dense_1_weights,
+        "dense_1_bias":dense_1_bias,
+        "dense_1_out":dense_1_out,
+        "dense_1_remainder":dense_1_remainder
+    }
+
+    out = [int(x) for x in dense_1_out]
+    out = [x if x < p//2 else 0 for x in out]
+    pred = np.argmax(out)
+
+    with open(input_path, "w") as f:
+        json.dump(in_json, f)
+
+    return pred
+
+def prepare(model, layers):
     if layers[0] == 196:
         _, test_images = dnn_datasets()
     elif layers[0] == 784:
@@ -162,7 +278,19 @@ def prepare(layers):
     return predictions_tf, test_images
 
 def cnn_datasets():
-    print ()
+    # Load TensorFlow MNIST data
+    mnist = tf.keras.datasets.mnist
+    (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
+
+    train_images_tf = train_images / 255.0
+    test_images_tf = test_images / 255.0
+    train_images_tf = train_images_tf.reshape(train_images.shape[0], 28, 28, 1)
+    test_images_tf = test_images_tf.reshape(test_images.shape[0], 28, 28, 1)
+
+    train_images_tf_14 = tf.image.resize(train_images_tf, [14, 14]).numpy()
+    test_images_tf_14 = tf.image.resize(test_images_tf, [14, 14]).numpy()
+
+    return test_images_tf, test_images_tf_14
 
 def gen_model_dnn(layers, model_in_path):
     if len(layers) == 3:
@@ -190,20 +318,30 @@ def gen_model_dnn(layers, model_in_path):
     return model
 
 # @ TODO: Hardcoded
-# def gen_model_cnn(layers, state_dict):
-#     if len(layers) == 6:
-        
-            
-#     elif len(layers) == 7:
-        
-#     elif len(layers) == 5:
-        
-#     else:
-#         print ("Layers not Support")
-#         return None
-    
+def gen_model_cnn(layers, model_in_path):
+    kernal_size = layers[-1]
 
-#     return model
+    # Define the LeNet model in TensorFlow
+    inputs = tf.keras.layers.Input(shape=(layers[0],layers[0],1))
+    out = tf.keras.layers.Conv2D(layers[1],kernal_size, use_bias = True)(inputs)
+    out = tf.keras.layers.ReLU()(out)
+    out = tf.keras.layers.AveragePooling2D()(out)
+    out = tf.keras.layers.Conv2D(layers[2],kernal_size, use_bias = True)(out)
+    out = tf.keras.layers.ReLU()(out)
+    out = tf.keras.layers.AveragePooling2D()(out)
+    out = tf.keras.layers.Flatten()(out)
+    out = tf.keras.layers.Dense(layers[3])(out)
+    out = tf.keras.layers.ReLU()(out)
+    out = tf.keras.layers.Dense(layers[4])(out)
+    model = tf.keras.Model(inputs, out)
+
+    model.load_weights(model_in_path)
+
+    # Compile the model
+    model.compile(optimizer='adam',
+                 loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                 metrics=['accuracy'])
+    return model
 
 def load_csv():
     csv_path = '../../benchmarks/benchmark_results.csv'
@@ -390,6 +528,73 @@ def benchmark_(test_images, predictions, weights, biases, layers, model_name, tm
 
     return
 
+def benchmark_cnn(test_images, predictions, layers, model_name, tmp_folder, input_path, zkey, veri_key, save=False):
+    loss = 0
+
+    target_circom = "_".join(str(x) for x in layers) + '.circom'
+
+    json_folder = tmp_folder + target_circom[:-7] + "_js/"
+    wit_json_file = json_folder + "generate_witness.js"
+    wasm_file = json_folder + target_circom[:-7] + ".wasm"
+    input_path = tmp_folder + "input.json"
+    wit_file = tmp_folder + "witness.wtns"
+
+    mem_usage = []
+    time_cost = []
+    benchmark_start_time = time.time()
+
+    for i in range(len(test_images)):
+        print ("process for image ",i)
+        cost = 0
+        X = test_images[i]
+        start_time = time.time()
+        pred = prepare_input_json_cnn(X, layers, input_path)
+
+        if pred != predictions[i]:
+            loss += 1
+            print ("Loss happens on index", i)
+
+        commands = [['node', wit_json_file, wasm_file, input_path, wit_file],
+                    ['snarkjs', 'groth16', 'prove',zkey, wit_file, tmp_folder+'proof.json', tmp_folder+'public.json']]
+                    #['snarkjs', 'groth16', 'verify',veri_key, tmp_folder+'public.json', tmp_folder+'proof.json']]
+
+        for command in commands:
+            _, _, usage = execute_and_monitor(command)
+            cost += usage
+        #print ("stdout:", stdout)
+            
+        mem_usage.append(cost)
+        time_cost.append(time.time() - start_time)
+
+    print ("Total time:", time.time() - benchmark_start_time)
+    layers = model_name.split("_")
+    arch_folder = arch_folders[model_name]
+
+    layers = layers[:-1]
+    layers[0] = str(int(layers[0])**2)
+    new_row = {
+        'Framework': ['circomlib-ml (tensorflow)'],
+        'Architecture': [f'Input-Conv2d-Conv2d-Dense-Dense-Dense ({"x".join(layers)})'],
+        '# Layers': [len(layers)],
+        '# Parameters': [params[model_name]],
+        'Testing Size': [len(mem_usage)],
+        'Accuracy Loss (%)': [loss/len(mem_usage) * 100],
+        'Avg Memory Usage (MB)': [sum(mem_usage) / len(mem_usage)],
+        'Std Memory Usage': [pd.Series(mem_usage).std()],
+        'Avg Proving Time (s)': [sum(time_cost) / len(time_cost)],
+        'Std Proving Time': [pd.Series(time_cost).std()]
+    }
+
+    new_row_df = pd.DataFrame(new_row)
+    print (new_row_df)
+
+    if save:
+        df = load_csv()
+        df = pd.concat([df, new_row_df], ignore_index=True)
+        csv_path = '../../benchmarks/benchmark_results.csv'
+        df.to_csv(csv_path, index=False)
+
+    return
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate benchmark result for a given model and testsize.")
@@ -398,7 +603,7 @@ if __name__ == "__main__":
     parser.add_argument('--save', type=bool, required=False, help='If save results')
     parser.add_argument('--dnn', action='store_true', help='Flag to indicate if this is a DNN model')
     parser.add_argument('--cnn', action='store_false', dest='dnn', help='Flag to indicate if this is not a DNN model')
-    parser.add_argument('--output', type=str, required=False, help='If save results')
+    parser.add_argument('--output', type=str, required=True, help='If save results')
     
     parser.add_argument('--accuracy', type=bool, required=False, help='Chose accuracy mode (CNN model not support)')
 
@@ -423,7 +628,7 @@ if __name__ == "__main__":
 
         model = gen_model_dnn(layers, model_in_path)
 
-        predicted_labels, tests = prepare(layers)
+        predicted_labels, tests = prepare(model, layers)
         weights, biases = transfer_weights(layers, model, 36)
 
         if len(layers)==3:
@@ -433,14 +638,16 @@ if __name__ == "__main__":
             print ("other")
             benchmark_(tests[:args.size], predicted_labels[:args.size], weights, biases,
                   layers, args.model, output_folder, output_folder+"input.json", zkey_1, veri_key, save=args.save)
-    # else:
-    #     arch_folder = arch_folders[args.model]
-        
-    #     state_dict = torch.load(model_path + arch_folder+ args.model + ".pth")
+    else:
+        arch_folder = arch_folders[args.model]
+        model_path = "../../models/"
+        model_in_path = model_path+arch_folder+args.model + '.h5'
 
-    #     model = gen_model_cnn(layers, state_dict)
-        
-    #     predicted_labels, tests = prepare_cnn(model, layers)
+        model = gen_model_cnn(layers, model_in_path)
 
-    #     benchmark_cnn(tests[:args.size], predicted_labels[:args.size], model, args.model, 
-    #             save=args.save)
+        _, tests = cnn_datasets()
+
+        predicted_labels = get_predictions_tf(model, tests)
+
+        benchmark_cnn(tests[:args.size], predicted_labels[:args.size], 
+                layers, args.model, output_folder, output_folder+"input.json", zkey_1, veri_key, save=args.save)

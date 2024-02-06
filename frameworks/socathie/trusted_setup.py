@@ -64,8 +64,8 @@ def setup(digit, model_name, output_folder, show = True):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate benchmark result for a given model and testsize.")
     parser.add_argument('--model', type=str, required=True, help='Model file path')
-    parser.add_argument('--output', type=str, required=False, help='If save results')
-    parser.add_argument('--show', type=bool, required=False, help='If show command detail')
+    parser.add_argument('--output', type=str, required=True, help='If save results')
+    
     args = parser.parse_args()
 
     if not args.show:
