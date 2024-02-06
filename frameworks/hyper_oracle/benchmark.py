@@ -187,7 +187,8 @@ def prepare(model, model_name, state_dict, test_images):
 
     return predicted_labels, fname_out
 
-def benchmark(test_images, predicted_labels, program, model_in_path, model_name, save = False):
+def benchmark(test_images, predicted_labels, program, 
+              model_in_path, model_name, save = False):
     vm_file = "./bin/vm"
     #program = "./bin/mlgo_196_IDD.bin"
     tmp_folder = './tmp/'
