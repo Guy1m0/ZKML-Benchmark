@@ -16,39 +16,6 @@ Addressing this challenge, I'm developing a zkML benchmark. This tool aids devel
 It's worth noting that machine learning models generally undergo two phases: the **training phase** and the **inference phase**. Due to the computational complexity associated with verifying training in-circuit, this benchmark primarily focuses on frameworks designed for the inference stage of ML models. 
 
 
-# Methogology
-
-## Metrics:
-
-proving time
-memory usage
-accuracy loss
-
-## Frameworks:
-
-### EZKL
-
-### ZKML
-
-### Circomlib-ml
-
-### OPML
-
-### Orion
-
-## Models:
-
-The exisiting ONNX framework to conver tensorflow to pytorch or verse vera is not working perfectly, therefore I manuanlly transfer the weight and bias from to make sure models perform exactly same cross the framework. Not only just testing the accuracy, but also compare the predictions for each image to ensure that.
-
-### DNN
-
-### CNN
-
-### Limitation
-
-
-## Other notes:
-
 
 # How to Benchmark
 
@@ -59,4 +26,4 @@ python benchmark.py --model <model name> --size <test size>
 
 The argments needed for each frameworks may vary. 
 
-> For socathie, need to do the trusted setup first
+> For socathie, need to do the setupt-circom.sh and then trusted setup first
