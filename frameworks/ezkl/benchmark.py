@@ -1,4 +1,4 @@
-import os, subprocess
+import os, subprocess, sys
 import torch, struct, os, psutil, subprocess, time, threading
 import torch.nn as nn
 import torch.nn.functional as F
@@ -233,7 +233,7 @@ def benchmark_cnn(test_images, predictions, model, model_name, mode = "resources
     layers[0] = str(int(layers[0])**2)
 
     new_row = {
-        'Framework': ['opml (pytorch)'],
+        'Framework': ['zkml (pytorch)'],
         'Architecture': [f'{arch_folder} ({"x".join(layers)})'],
         '# Layers': [len(layers)],
         '# Parameters': [params[model_name]],
@@ -463,24 +463,51 @@ def gen_model_dnn(layers, state_dict):
     model.eval()
     return model
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate benchmark result for a given model and testsize.")
-    parser.add_argument('--size', type=int, required=True, help='Test Size')
-    parser.add_argument('--model', type=str, required=True, help='Model file path')
-    parser.add_argument('--save', type=bool, required=False, help='If save results')
-    parser.add_argument('--dnn', action='store_true', help='Flag to indicate if this is a DNN model')
-    parser.add_argument('--cnn', action='store_false', dest='dnn', help='Flag to indicate if this is not a DNN model')
+def show_models():
+    for key in params:
+        layers = key.split("_")
+        if int(layers[0]) < 30:
+            arch = arch_folders[key]
+        else:
+            arch = "input" + (len(layers)-1) * "-dense" 
 
-    parser.add_argument('--accuracy', type=bool, required=False, help='Chose accuracy mode (CNN model not support)')
+        print (f'model_name: {key} | arch: {arch}')
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Generate benchmark result for a given model and testsize.",
+        epilog="Example usage: python benchmark.py --size 100 --model model_name"
+    )
+    #parser = argparse.ArgumentParser(description="Generate benchmark result for a given model and testsize.")
+    parser.add_argument('--size', type=int, help='Test Size')
+    parser.add_argument('--model', type=str, help='Model file path')
+
+    # Mutually exclusive for showing models only
+    show_group = parser.add_mutually_exclusive_group()
+    show_group.add_argument('--list', action='store_true', help='Show list of supported models and exit')
+
+    parser.add_argument('--save', action='store_true', help='Flag to indicate if save results')
+
+    parser.add_argument('--accuracy', action='store_true', help='Flag to indicate if use accuracy mode which may sacrifice efficiency')
 
     args = parser.parse_args()
+
+    if args.list:
+        show_models()
+        sys.exit()
+
+    if not args.model or args.size is None:
+        parser.error('--model and --size are required for benchmarking.')
+
     layers = [int(x) for x in args.model.split("_")]
     model_path = "../../models/"
 
-    if not args.save:
-        args.save = False
-
-    if args.dnn:
+    if layers[0] > 30:
+        dnn = True
+    else:
+        dnn = False
+        
+    if dnn:
         arch_folder = "input" + (len(layers)-1) * "-dense" + "/"
 
         model_path = "../../models/"
@@ -499,7 +526,7 @@ if __name__ == "__main__":
 
         predicted_labels, tests = prepare(model, layers)
         benchmark_dnn(tests[:args.size], predicted_labels[:args.size], model, args.model, 
-                      mode=mode, save=args.save)
+                    mode=mode, save=args.save)
     else:
         arch_folder = arch_folders[args.model]
         

@@ -1,8 +1,9 @@
 ZKML Benchmarking
 ===
-
+> Disclaimer:
 
 # Introduction
+
 
 As machine learning continues to expand in the global market, the reliability and integrity of its models have become paramount. Considering the case of Machine Learning as a Service (MLaaS), there's an inherent need to guarantee that the offered model truly matches its description (also noted as **model authenticity**), while operating within accurate parameters and maintaining a degree of privacy. Zero-knowledge proof, more specifically zero-knowledge Machine Learning (zkML), steps in to bridge this trust gap, vouching for both the integrity of computations and the confidentiality of underlying weights and structures.
 
@@ -13,6 +14,40 @@ Consequently, progress has been made in crafting custom circuits using existing 
 Addressing this challenge, I'm developing a zkML benchmark. This tool aids developers in discerning the trade-offs and performance nuances among various frameworks. While manually setting up and conducting benchmarks for the increasing number of frameworks can be daunting, and though these frameworks often come with their benchmark sets, direct comparisons become intricate due to the myriad of performance-impacting variables. My approach has been to establish uniform conditions across all frameworks, aiming to offer a pragmatic and straightforward comparison among them.
 
 It's worth noting that machine learning models generally undergo two phases: the **training phase** and the **inference phase**. Due to the computational complexity associated with verifying training in-circuit, this benchmark primarily focuses on frameworks designed for the inference stage of ML models. 
+
+
+# Methogology
+
+## Metrics:
+
+proving time
+memory usage
+accuracy loss
+
+## Frameworks:
+
+### EZKL
+
+### ZKML
+
+### Circomlib-ml
+
+### OPML
+
+### Orion
+
+## Models:
+
+The exisiting ONNX framework to conver tensorflow to pytorch or verse vera is not working perfectly, therefore I manuanlly transfer the weight and bias from to make sure models perform exactly same cross the framework. Not only just testing the accuracy, but also compare the predictions for each image to ensure that.
+
+### DNN
+
+### CNN
+
+### Limitation
+
+
+## Other notes:
 
 
 # How to Benchmark

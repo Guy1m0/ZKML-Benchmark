@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import subprocess
 
-import subprocess, os, argparse
+import subprocess, os, argparse, sys
 import concurrent.futures, json, threading, psutil, time
 
 import pandas as pd
@@ -13,16 +13,12 @@ p = 2188824287183927522224640574525727508854836440041603434369820418657580849561
 params = {"784_56_10": 44543,
           "196_25_10": 5185,
           "196_24_14_10": 5228,
-            "28_6_16_10_5": 5142,
-            "14_5_11_80_10_3": 4966, # @TODO: May doublecheck
-            "28_6_16_120_84_10_5": 44530}
+            "14_5_11_80_10_3": 4966}
 
 accuracys = {"784_56_10": 0.9740,
             "196_25_10": 0.9541,
             "196_24_14_10": 0.9556,
-            "28_6_16_10_5": 0.9877,
-            "14_5_11_80_10_3": 0.9556, # @TODO: May doublecheck
-            "28_6_16_120_84_10_5": 0.9877}
+            "14_5_11_80_10_3": 0.9556}
 
 arch_folders = {"28_6_16_10_5": "input-conv2d-conv2d-dense/",
                 "14_5_11_80_10_3": "input-conv2d-conv2d-dense-dense/",
@@ -596,20 +592,39 @@ def benchmark_cnn(test_images, predictions, layers, model_name, tmp_folder, inpu
 
     return
 
+def show_models():
+    for key in params:
+        layers = key.split("_")
+        if int(layers[0]) < 30:
+            arch = arch_folders[key]
+        else:
+            arch = "input" + (len(layers)-1) * "-dense" 
+
+        print (f'model_name: {key} | arch: {arch}')
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate benchmark result for a given model and testsize.")
-    parser.add_argument('--size', type=int, required=True, help='Test Size')
-    parser.add_argument('--model', type=str, required=True, help='Model file path')
-    parser.add_argument('--save', type=bool, required=False, help='If save results')
-    parser.add_argument('--dnn', action='store_true', help='Flag to indicate if this is a DNN model')
-    parser.add_argument('--cnn', action='store_false', dest='dnn', help='Flag to indicate if this is not a DNN model')
-    parser.add_argument('--output', type=str, required=True, help='If save results')
-    
-    parser.add_argument('--accuracy', type=bool, required=False, help='Chose accuracy mode (CNN model not support)')
+
+    # Mutually exclusive for showing models only
+    show_group = parser.add_mutually_exclusive_group()
+    show_group.add_argument('--list', action='store_true', help='Show list of supported models and exit')
+
+    parser.add_argument('--save', action='store_true', help='Flag to indicate if save results')
+
+    parser.add_argument('--size', type=int, help='Test Size')
+    parser.add_argument('--model', type=str, help='Model file path')
+
+    parser.add_argument('--output', type=str, default="./tmp/",help='If save results')
 
     args = parser.parse_args()
 
-    args = parser.parse_args()
+    if args.list:
+        show_models()
+        sys.exit()
+
+    if not args.model or args.size is None:
+        parser.error('--model and --size are required for benchmarking.')
+
     layers = [int(x) for x in args.model.split("_")]
     model_path = "../../models/"
 
@@ -618,10 +633,12 @@ if __name__ == "__main__":
     zkey_1 = output_folder + "ceremony/test_0000.zkey"
     veri_key = output_folder + "ceremony/vk.json"
 
-    if not args.save:
-        args.save = False
+    if layers[0] > 30:
+        dnn = True
+    else:
+        dnn = False
 
-    if args.dnn:
+    if dnn:
         arch_folder = "input" + (len(layers)-1) * "-dense" + "/"
         model_path = "../../models/"
         model_in_path = model_path+arch_folder+args.model + '.h5'

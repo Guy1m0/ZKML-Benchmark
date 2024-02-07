@@ -1,8 +1,7 @@
 import numpy as np
-import torch, re, os, argparse
+import re, os, argparse, sys
 import tensorflow as tf
 import concurrent.futures, subprocess, threading, psutil, time
-import matplotlib.pyplot as plt
 import pandas as pd
 
 params = {"784_56_10": 44543,
@@ -248,24 +247,52 @@ def load_csv():
 
     return df
 
+def show_models():
+    for key in params:
+        layers = key.split("_")
+        if int(layers[0]) < 30:
+            arch = arch_folders[key]
+        else:
+            arch = "input" + (len(layers)-1) * "-dense" 
+
+        print (f'model_name: {key} | arch: {arch}')
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate benchmark result for a given model and testsize.")
+    parser = argparse.ArgumentParser(
+        description="Generate benchmark result for a given model and testsize.",
+        epilog="Example usage: python benchmark.py --size 100 --model model_name"
+    )    
+    # Mutually exclusive for showing models only
+    show_group = parser.add_mutually_exclusive_group()
+    show_group.add_argument('--list', action='store_true', help='Show list of supported models and exit')
+
     parser.add_argument('--size', type=int, required=True, help='Test Size')
     parser.add_argument('--model', type=str, required=True, help='Model file path')
-    parser.add_argument('--save', type=bool, required=False, help='If save results')
-    parser.add_argument('--dnn', action='store_true', help='Flag to indicate if this is a DNN model')
-    parser.add_argument('--cnn', action='store_false', dest='dnn', help='Flag to indicate if this is not a DNN model')
+
+    parser.add_argument('--save', action='store_true', help='Flag to indicate if save results')
 
     args = parser.parse_args()
+
+    if args.list:
+        show_models()
+        sys.exit()
+
+    if not args.model or args.size is None:
+        parser.error('--model and --size are required for benchmarking.')
+
     layers = [int(x) for x in args.model.split("_")]
     model_path = "../../models/"
 
     if not args.save:
         args.save = False
 
-    if args.dnn:
+    if layers[0] > 30:
+        dnn = True
+    else:
+        dnn = False
+
+    if dnn:
         arch_folder = "input" + (len(layers)-1) * "-dense" + "/"
 
         model_path = "../../models/"

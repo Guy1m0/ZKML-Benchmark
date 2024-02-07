@@ -1,4 +1,4 @@
-import torch, struct, os, psutil, subprocess, time, threading
+import torch, struct, os, psutil, subprocess, time, sys
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
@@ -255,17 +255,40 @@ def benchmark(test_images, predicted_labels, program,
 
     return
 
+def show_models():
+    for key in params:
+        layers = key.split("_")
+        arch = "input" + (len(layers)-1) * "-dense" 
+
+        print (f'model_name: {key} | arch: {arch}')
 
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate benchmark result for a given model and testsize.")
-    parser.add_argument('--size', type=int, required=True, help='Test Size')
-    parser.add_argument('--model', type=str, required=True, help='Model file path')
-    parser.add_argument('--save', type=bool, required=False, help='If save results')
+    parser = argparse.ArgumentParser(
+        description="Generate benchmark result for a given model and testsize.",
+        epilog="Example usage: python benchmark.py --size 100 --model model_name"
+    )
 
+    #parser = argparse.ArgumentParser(description="Generate benchmark result for a given model and testsize.")
+    parser.add_argument('--size', type=int, help='Test Size')
+    parser.add_argument('--model', type=str, help='Model file path')
+
+    # Mutually exclusive for showing models only
+    show_group = parser.add_mutually_exclusive_group()
+    show_group.add_argument('--list', action='store_true', help='Show list of supported models and exit')
+
+    parser.add_argument('--save', action='store_true', help='Flag to indicate if save results')
 
     args = parser.parse_args()
+
+    if args.list:
+        show_models()
+        sys.exit()
+
+    if not args.model or args.size is None:
+        parser.error('--model and --size are required for benchmarking.')
+
 
     # Load TensorFlow MNIST data
     mnist = tf.keras.datasets.mnist

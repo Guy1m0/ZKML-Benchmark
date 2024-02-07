@@ -13,7 +13,7 @@ def find_digit(output):
     else:
         print("Constraints not found")
 
-def setup(digit, model_name, output_folder, show = True):
+def setup(digit, model_name, output_folder):
     ceremony_folder = output_folder + 'ceremony/'
     os.makedirs(ceremony_folder, exist_ok=True)
     ptau_1 = ceremony_folder + 'pot12_0000.ptau'
@@ -68,9 +68,6 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
 
-    if not args.show:
-        args.show = False
-
     circuit_folder = "./golden_circuits/"
     target_circom = args.model + '.circom'    
     output_folder = f'./{args.output}/'
@@ -80,5 +77,5 @@ if __name__ == "__main__":
     res = subprocess.run(command, capture_output=True, text = True)
     digit = find_digit(res.stdout)
 
-    setup(digit, args.model, output_folder, args.show)
+    setup(digit, args.model, output_folder)
 
