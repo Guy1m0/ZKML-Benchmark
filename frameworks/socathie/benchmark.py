@@ -651,6 +651,8 @@ if __name__ == "__main__":
     target_circom = "_".join(str(x) for x in layers) + '.circom'
 
     command = ['circom', "./golden_circuits/" + target_circom, "--r1cs", "--wasm", "--sym", "-o", output_folder]
+    # subprocess.run(command)
+    # sys.exit()
     _, _, _ = execute_and_monitor(command)
 
     if layers[0] > 30:
