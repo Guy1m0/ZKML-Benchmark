@@ -141,8 +141,8 @@ def benchmark(test_images, predictions, model_name, model_in_path, test=False, s
     input_convert_path = "./tools/input_converter.py"
     config_out_path = msgpack_folder+"config.msgpack"
 
-    time_circuit = "./bin/time_circuit"
-    test_circuit = "./bin/test_circuit"
+    time_circuit = circuit_folder + "time_circuit"
+    test_circuit = circuit_folder + "test_circuit"
 
     call_path = time_circuit
     if test:
@@ -193,7 +193,8 @@ def benchmark(test_images, predictions, model_name, model_in_path, test=False, s
         time_cost.append(time.time() - start_time)
 
     print ("Total time:", time.time() - benchmark_start_time)
-    if arch_folders[model_name]:
+
+    if int(model_name.split("_")[0]) < 30:
         layers = model_name.split("_")
         arch_folder = arch_folders[model_name]
 
@@ -204,6 +205,7 @@ def benchmark(test_images, predictions, model_name, model_in_path, test=False, s
     else:
         layers = model_name.split("_")
         arch = "input" + (len(layers)-1) * "-dense"
+
     new_row = {
         'Framework': ['zkml (tensorflow)'],
         'Architecture': [arch],
@@ -267,10 +269,11 @@ if __name__ == "__main__":
     show_group = parser.add_mutually_exclusive_group()
     show_group.add_argument('--list', action='store_true', help='Show list of supported models and exit')
 
-    parser.add_argument('--size', type=int, required=True, help='Test Size')
-    parser.add_argument('--model', type=str, required=True, help='Model file path')
+    parser.add_argument('--size', type=int, help='Test Size')
+    parser.add_argument('--model', type=str, help='Model file path')
 
     parser.add_argument('--save', action='store_true', help='Flag to indicate if save results')
+    parser.add_argument('--arm', action='store_true', help='Flag to indicate if use Arm64 Arch')
 
     args = parser.parse_args()
 
@@ -292,6 +295,12 @@ if __name__ == "__main__":
     else:
         dnn = False
 
+    if args.arm:
+        circuit_folder = "./arm_64/"
+    else:
+        circuit_folder = "./x86_64"
+
+    print (circuit_folder)
     if dnn:
         arch_folder = "input" + (len(layers)-1) * "-dense" + "/"
 
@@ -308,7 +317,6 @@ if __name__ == "__main__":
             _, tests = dnn_datasets()
         predicted_labels = get_predictions(interpreter, tests)
 
-        benchmark(tests[:args.size], predicted_labels[:args.size], args.model, model_in_path, save=args.save)
     else:
         arch_folder = arch_folders[args.model]
         model_in_path = model_path + arch_folder + args.model +'.tflite'
@@ -321,4 +329,5 @@ if __name__ == "__main__":
         else:
             _, tests = cnn_datasets()
         predicted_labels = get_predictions(interpreter, tests)
-        benchmark(tests[:args.size], predicted_labels[:args.size], args.model, model_in_path, save=args.save)
+
+    benchmark(tests[:args.size], predicted_labels[:args.size], args.model, model_in_path, circuit_folder, save=args.save)

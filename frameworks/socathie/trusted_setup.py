@@ -1,4 +1,28 @@
-import os, subprocess, psutil, concurrent, time, re, argparse
+import os, subprocess, psutil, concurrent, time, re, argparse, sys
+
+params = {"784_56_10": 44543,
+          "196_25_10": 5185,
+          "196_24_14_10": 5228,
+            "14_5_11_80_10_3": 4966}
+
+accuracys = {"784_56_10": 0.9740,
+            "196_25_10": 0.9541,
+            "196_24_14_10": 0.9556,
+            "14_5_11_80_10_3": 0.9556}
+
+arch_folders = {"28_6_16_10_5": "input-conv2d-conv2d-dense/",
+                "14_5_11_80_10_3": "input-conv2d-conv2d-dense-dense/",
+                "28_6_16_120_84_10_5": "input-conv2d-conv2d-dense-dense-dense/"}
+
+def show_models():
+    for key in params:
+        layers = key.split("_")
+        if int(layers[0]) < 30:
+            arch = arch_folders[key]
+        else:
+            arch = "input" + (len(layers)-1) * "-dense" 
+
+        print (f'model_name: {key} | arch: {arch}')
 
 def find_digit(output):
     match = re.search(r'non-linear constraints: (\d+)', output)
@@ -62,11 +86,22 @@ def setup(digit, model_name, output_folder):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate benchmark result for a given model and testsize.")
-    parser.add_argument('--model', type=str, required=True, help='Model file path')
-    parser.add_argument('--output', type=str, required=True, help='If save results')
+    parser = argparse.ArgumentParser(description="Given the provided model, generate trusted setup for later benchmarking")
+        # Mutually exclusive for showing models only
+    show_group = parser.add_mutually_exclusive_group()
+    show_group.add_argument('--list', action='store_true', help='Show list of supported models and exit')
+
+    parser.add_argument('--model', type=str, help='Model file path')
+    parser.add_argument('--output', type=str, default="./tmp/",help='Specify the output folder')
     
     args = parser.parse_args()
+
+    if args.list:
+        show_models()
+        sys.exit()
+
+    if args.model is None:
+        parser.error('--model is required for trusted setup.')
 
     circuit_folder = "./golden_circuits/"
     target_circom = args.model + '.circom'    

@@ -19,11 +19,21 @@ It's worth noting that machine learning models generally undergo two phases: the
 
 # How to Benchmark
 
-For each frameworks please run the bash code
+For each frameworks please first check all the supported model by running:
+```
+python benchmark.py --list
+```
+
+and then run the benchmark:
 ```
 python benchmark.py --model <model name> --size <test size>
 ```
 
-The argments needed for each frameworks may vary. 
+To show all the commands
+```
+python benchmark.py -h
+```
 
-> For socathie, need to do the setupt-circom.sh and then trusted setup first
+Please note that the argments needed for each frameworks may vary. 
+
+> For framework proposed by socathie, need to do the 'setupt-circom.sh' and then run the script 'trusted_setup.py'. Better not reuse trusted-setup env for other model, if and only if the original is big enought. Or will return "[ERROR] snarkJS: Error: Invalid witness length."

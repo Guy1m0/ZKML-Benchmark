@@ -22,7 +22,7 @@ These frameworks have been chosen based on their popularity (indicated by GitHub
 The primary metrics for benchmarking include:
 
 1. **Proof Generation Time:** The duration taken by each framework to generate a proof. This metric is crucial for assessing the efficiency of the proof system.
-2. **Accuracy:** 
+2. **Accuracy Loss:** 
 3. **Maximum Prover Memory Usage:** The peak memory usage during the proof generation process, indicating the resource intensity of the system.
 4. **Framework Compatibility:** Evaluation of each framework's compatibility with different machine learning model formats and operating systems.
 

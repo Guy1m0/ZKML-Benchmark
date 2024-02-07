@@ -398,14 +398,20 @@ def benchmark(test_images, predictions, weights, biases, layers, model_name, tmp
         if pred != predictions[i]:
             loss += 1
             print ("Loss happens on index", i)
-
+        # print ('wit:', wit_json_file)
+        # print ('input:', input_path)
+        # print ('target:', target_circom)
         commands = [['node', wit_json_file, wasm_file, input_path, wit_file],
                     ['snarkjs', 'groth16', 'prove',zkey, wit_file, tmp_folder+'proof.json', tmp_folder+'public.json']]
                     #['snarkjs', 'groth16', 'verify',veri_key, tmp_folder+'public.json', tmp_folder+'proof.json']]
 
         for command in commands:
-            _, _, usage = execute_and_monitor(command)
+            stdout, _, usage = execute_and_monitor(command)
+            if "ERROR" in stdout:
+                print (stdout)
+                return
             cost += usage
+            # subprocess.run(command)
         #print ("stdout:", stdout)
             
         mem_usage.append(cost)
@@ -491,7 +497,10 @@ def benchmark_(test_images, predictions, weights, biases, layers, model_name, tm
                     #['snarkjs', 'groth16', 'verify',veri_key, tmp_folder+'public.json', tmp_folder+'proof.json']]
 
         for command in commands:
-            _, _, usage = execute_and_monitor(command)
+            stdout, _, usage = execute_and_monitor(command)
+            if "ERROR" in stdout:
+                print (stdout)
+                return
             cost += usage
         #print ("stdout:", stdout)
             
@@ -555,7 +564,10 @@ def benchmark_cnn(test_images, predictions, layers, model_name, tmp_folder, inpu
                     #['snarkjs', 'groth16', 'verify',veri_key, tmp_folder+'public.json', tmp_folder+'proof.json']]
 
         for command in commands:
-            _, _, usage = execute_and_monitor(command)
+            stdout, _, usage = execute_and_monitor(command)
+            if "ERROR" in stdout:
+                print (stdout)
+                return
             cost += usage
         #print ("stdout:", stdout)
             
@@ -614,7 +626,7 @@ if __name__ == "__main__":
     parser.add_argument('--size', type=int, help='Test Size')
     parser.add_argument('--model', type=str, help='Model file path')
 
-    parser.add_argument('--output', type=str, default="./tmp/",help='If save results')
+    parser.add_argument('--output', type=str, default="tmp",help='Specify the output folder')
 
     args = parser.parse_args()
 
@@ -632,6 +644,10 @@ if __name__ == "__main__":
     os.makedirs(output_folder, exist_ok=True)
     zkey_1 = output_folder + "ceremony/test_0000.zkey"
     veri_key = output_folder + "ceremony/vk.json"
+    target_circom = "_".join(str(x) for x in layers) + '.circom'
+
+    command = ['circom', "./golden_circuits/" + target_circom, "--r1cs", "--wasm", "--sym", "-o", output_folder]
+    _, _, _ = execute_and_monitor(command)
 
     if layers[0] > 30:
         dnn = True
@@ -652,7 +668,7 @@ if __name__ == "__main__":
             benchmark(tests[:args.size], predicted_labels[:args.size], weights, biases,
                   layers, args.model, output_folder, output_folder+"input.json", zkey_1, veri_key, save=args.save)
         if len(layers)==4:
-            print ("other")
+            #print ("other")
             benchmark_(tests[:args.size], predicted_labels[:args.size], weights, biases,
                   layers, args.model, output_folder, output_folder+"input.json", zkey_1, veri_key, save=args.save)
     else:
