@@ -73,7 +73,7 @@ def gen_proof(output_folder, data_path , model_path, mode = "resources"):
         )
     #print(proof)
     assert os.path.isfile(proof_path)
-    print ('Proof Gen')
+    #print ('Proof Gen')
     return pred
 
 

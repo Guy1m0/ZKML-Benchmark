@@ -153,7 +153,9 @@ def benchmark_dnn(test_images, predictions, model, model_name, mode = "resources
         json.dump(data, open(data_path, 'w'))
 
         command = ["python", "gen_proof.py", "--model", model_path, "--data", data_path, "--output", output_folder, "--mode", mode]
-        #subprocess.run(command)
+        # subprocess.run(command)
+        # stdout = "1234"
+        # usage = 1
         stdout, _, usage = execute_and_monitor(command)
         pred = int(stdout[-2])
 
@@ -214,7 +216,9 @@ def benchmark_cnn(test_images, predictions, model, model_name, mode = "resources
                         output_names=['output'])
     
         command = ["python", "gen_proof.py", "--model", model_path, "--data", data_path, "--output", output_folder, "--mode", mode]
-        
+        # subprocess.run(command)
+        # stdout = "1234"
+        # usage = 1
         stdout, _, usage = execute_and_monitor(command)
         pred = int(stdout[-2])
 
