@@ -500,6 +500,10 @@ if __name__ == "__main__":
         show_models()
         sys.exit()
 
+    if args.model not in params:
+        print ("Please check the model name by using '--list'")
+        sys.exit()
+
     if not args.model or args.size is None:
         parser.error('--model and --size are required for benchmarking.')
 

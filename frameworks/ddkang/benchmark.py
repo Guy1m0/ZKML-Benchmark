@@ -284,6 +284,10 @@ if __name__ == "__main__":
     if not args.model or args.size is None:
         parser.error('--model and --size are required for benchmarking.')
 
+    if args.model not in params:
+        print ("Please check the model name by using '--list'")
+        sys.exit()
+
     layers = [int(x) for x in args.model.split("_")]
     model_path = "../../models/"
 
@@ -298,7 +302,7 @@ if __name__ == "__main__":
     if args.arm:
         circuit_folder = "./arm_64/"
     else:
-        circuit_folder = "./x86_64"
+        circuit_folder = "./x86_64/"
 
     print (circuit_folder)
     if dnn:
