@@ -170,7 +170,7 @@ def prepare(model, model_name, state_dict, test_images):
 
     for name in state_dict.keys():
         data = state_dict[name].squeeze().numpy()
-        print("Processing variable: " + name + " with shape: ", data.shape) 
+        #print("Processing variable: " + name + " with shape: ", data.shape) 
         n_dims = len(data.shape)
     
         fout.write(struct.pack(pack_fmt, n_dims))
@@ -321,14 +321,21 @@ if __name__ == "__main__":
     if not args.save:
         args.save = False
 
-    if layers[0] == 784:
+    if layers[0] == 784 and len(layers) == 3:
         program = "./bin/mlgo_784_IDD.bin"
         predicted_labels, model_in_path = prepare(model, args.model, state_dict, test_images_pt)
         tests = test_images_pt[:args.size]
-    elif layers[0] == 196:
+    elif layers[0] == 196 and len(layers) == 3:
         program = "./bin/mlgo_196_IDD.bin"
         predicted_labels, model_in_path = prepare(model, args.model, state_dict, test_images_pt_downsampled)
         tests = test_images_pt_downsampled[:args.size]
+    elif layers[0] == 196 and len(layers) == 4:
+        program = "./bin/mlgo_196_IDDD.bin"
+        predicted_labels, model_in_path = prepare(model, args.model, state_dict, test_images_pt_downsampled)
+        tests = test_images_pt_downsampled[:args.size]        
+    else:
+        print ("format not support")
+        sys.exit()
 
     #, args.size, test_images_pt, test_labels_pt, args.model, args.save
     
