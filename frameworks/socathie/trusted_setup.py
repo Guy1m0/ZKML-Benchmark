@@ -39,6 +39,7 @@ def find_digit(output):
         print("Constraints not found")
 
 def setup(digit, model_name, output_folder):
+    start_time = time.time()
     ceremony_folder = output_folder + f'{str(digit)}/'
     os.makedirs(ceremony_folder, exist_ok=True)
     ptau_1 = ceremony_folder + 'pot12_0000.ptau'
@@ -80,7 +81,8 @@ def setup(digit, model_name, output_folder):
     command = ['snarkjs', 'zkey', 'export','verificationkey', zkey_1, veri_key]
     print (command)
     subprocess.run(command)
-
+    
+    print ('Total time cost:', time.time() - start_time)
 
     return zkey_1, veri_key
 
