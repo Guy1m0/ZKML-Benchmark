@@ -10,8 +10,9 @@ import pandas as pd
 p = 21888242871839275222246405745257275088548364400416034343698204186575808495617
 
 params = {"784_56_10": 44543,
-          "196_25_10": 5185,
-          "196_24_14_10": 5228,
+            "196_25_10": 5185,
+            "196_24_14_10": 5228,
+            "28_6_16_10_5":5142,
             "14_5_11_80_10_3": 4966}
 
 accuracys = {"784_56_10": 0.9740,
@@ -374,6 +375,7 @@ def benchmark(test_images, predictions, weights, biases, layers, model_name, tmp
     for i in range(len(test_images)):
         cost = 0
         X = test_images[i:i+1]
+        print ("process for image ",i)
         start_time = time.time()
         X_in = [int(x*1e36) for x in X[0]]
         x_in, dense_weights, dense_biases, dense_outs, dense_remainders, relu_outs, pred = prepare_input_json(layers, weights, biases, X_in, scalar=36, relu=True)
@@ -423,7 +425,7 @@ def benchmark(test_images, predictions, weights, biases, layers, model_name, tmp
     layers = model_name.split("_")
     new_row = {
         'Framework': ['circomlib-ml (tensorflow)'],
-        'Architecture': [f'Input-Dense-Dense ({"x".join(layers)})'],
+        'Architecture': [f'{arch_folder} ({"x".join(layers)})'],
         '# Layers': [len(layers)],
         '# Parameters': [params[model_name]],
         'Testing Size': [len(mem_usage)],
@@ -463,6 +465,7 @@ def benchmark_(test_images, predictions, weights, biases, layers, model_name, tm
     for i in range(len(test_images)):
         cost = 0
         X = test_images[i:i+1]
+        print ("process for image ",i)
         start_time = time.time()
         X_in = [int(x*1e36) for x in X[0]]
         x_in, dense_weights, dense_biases, dense_outs, dense_remainders, relu_outs, pred = prepare_input_json(layers, weights, biases, X_in, scalar=36, relu=True)
@@ -513,7 +516,7 @@ def benchmark_(test_images, predictions, weights, biases, layers, model_name, tm
     layers = model_name.split("_")
     new_row = {
         'Framework': ['circomlib-ml (tensorflow)'],
-        'Architecture': [f'Input-Dense-Dense-Dense ({"x".join(layers)})'],
+        'Architecture': [f'{arch_folder} ({"x".join(layers)})'],
         '# Layers': [len(layers)],
         '# Parameters': [params[model_name]],
         'Testing Size': [len(mem_usage)],
@@ -584,7 +587,7 @@ def benchmark_cnn(test_images, predictions, layers, model_name, tmp_folder, inpu
     layers[0] = str(int(layers[0])**2)
     new_row = {
         'Framework': ['circomlib-ml (tensorflow)'],
-        'Architecture': [f'Input-Conv2d-Conv2d-Dense-Dense-Dense ({"x".join(layers)})'],
+        'Architecture': [f'{arch_folder} ({"x".join(layers)})'],
         '# Layers': [len(layers)],
         '# Parameters': [params[model_name]],
         'Testing Size': [len(mem_usage)],
@@ -617,7 +620,7 @@ def show_models():
         print (f'model_name: {key} | arch: {arch}')
 
 def update_zkey(ceremony_folder, model_name):
-    print ('Update zkey for new circuit')
+    print ('Update zkey to avoid mismatch in witness and circuit')
     r1cs_path = output_folder + model_name + ".r1cs"
     zkey_1 = ceremony_folder + 'test_0000.zkey'
     ptau_3 = ceremony_folder + 'pot12_final.ptau'
@@ -679,7 +682,7 @@ if __name__ == "__main__":
     command = ['circom', "./golden_circuits/" + target_circom, "--r1cs", "--wasm", "--sym", "-o", output_folder]
     #command = ['circom', circuit_folder + target_circom, "--r1cs", "--wasm", "--sym", "-o", output_folder]
     res = subprocess.run(command, capture_output=True, text = True)
-    #print (res.stdout)
+    print (res.stdout)
     digit = find_digit(res.stdout)
 
     zkey_1 = output_folder + f"{str(digit)}/test_0000.zkey"
@@ -696,7 +699,7 @@ if __name__ == "__main__":
         ]
         subprocess.run(trusted_setup_command)
 
-    update_zkey(output_folder + str(digit)+"/", args.model)
+    # update_zkey(output_folder + str(digit)+"/", args.model)
     # subprocess.run(command)
     # sys.exit()
     # _, _, _ = execute_and_monitor(command)
