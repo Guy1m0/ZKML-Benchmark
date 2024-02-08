@@ -38,7 +38,7 @@ def find_digit(output):
         print("Constraints not found")
 
 def setup(digit, model_name, output_folder):
-    ceremony_folder = output_folder + 'ceremony/'
+    ceremony_folder = output_folder + f'{str(digit)}/'
     os.makedirs(ceremony_folder, exist_ok=True)
     ptau_1 = ceremony_folder + 'pot12_0000.ptau'
 
@@ -91,6 +91,7 @@ if __name__ == "__main__":
     show_group = parser.add_mutually_exclusive_group()
     show_group.add_argument('--list', action='store_true', help='Show list of supported models and exit')
 
+    # parser.add_argument('--digit', type =int, help='Specify the max support circuit size 2**digit')
     parser.add_argument('--model', type=str, help='Model file path')
     parser.add_argument('--output', type=str, default="./tmp/",help='Specify the output folder')
     

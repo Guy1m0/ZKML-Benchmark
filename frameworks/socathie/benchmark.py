@@ -1,8 +1,7 @@
 import numpy as np
 import tensorflow as tf
-import subprocess
 
-import subprocess, os, argparse, sys
+import subprocess, os, argparse, sys, re
 import concurrent.futures, json, threading, psutil, time
 
 import pandas as pd
@@ -28,7 +27,7 @@ def get_predictions_tf(model, test_images, batch_size=256):
     predictions = []
     for i in range(0, len(test_images), batch_size):
         batch = test_images[i:i+batch_size]
-        pred = model.predict(batch)
+        pred = model.predict(batch, verbose=0)
         predictions.extend(np.argmax(pred, axis=1))
     return predictions
 
@@ -402,12 +401,14 @@ def benchmark(test_images, predictions, weights, biases, layers, model_name, tmp
         # print ('input:', input_path)
         # print ('target:', target_circom)
         commands = [['node', wit_json_file, wasm_file, input_path, wit_file],
-                    ['snarkjs', 'groth16', 'prove',zkey, wit_file, tmp_folder+'proof.json', tmp_folder+'public.json']]
+                    ['snarkjs', 'groth16', 'prove', zkey, wit_file, tmp_folder+'proof.json', tmp_folder+'public.json']]
                     #['snarkjs', 'groth16', 'verify',veri_key, tmp_folder+'public.json', tmp_folder+'proof.json']]
 
         for command in commands:
             stdout, _, usage = execute_and_monitor(command)
             if "ERROR" in stdout:
+                #print ('command:', command)
+
                 print (stdout)
                 return
             cost += usage
@@ -453,7 +454,7 @@ def benchmark_(test_images, predictions, weights, biases, layers, model_name, tm
     wit_json_file = json_folder + "generate_witness.js"
     wasm_file = json_folder + target_circom[:-7] + ".wasm"
     input_path = tmp_folder + "input.json"
-    wit_file = tmp_folder + "witness.wtns"
+    wit_file = tmp_folder + target_circom[:-7] + "_witness.wtns"
 
     mem_usage = []
     time_cost = []
@@ -499,6 +500,7 @@ def benchmark_(test_images, predictions, weights, biases, layers, model_name, tm
         for command in commands:
             stdout, _, usage = execute_and_monitor(command)
             if "ERROR" in stdout:
+                #print ('command:', command)
                 print (stdout)
                 return
             cost += usage
@@ -614,6 +616,32 @@ def show_models():
 
         print (f'model_name: {key} | arch: {arch}')
 
+def update_zkey(ceremony_folder, model_name):
+    print ('Update zkey for new circuit')
+    r1cs_path = output_folder + model_name + ".r1cs"
+    zkey_1 = ceremony_folder + 'test_0000.zkey'
+    ptau_3 = ceremony_folder + 'pot12_final.ptau'
+    command = ['snarkjs', 'groth16', 'setup', r1cs_path, ptau_3, zkey_1]
+    #print (command)
+    res = subprocess.run(command, capture_output=True, text = True)
+    if "ERROR" in res.stdout:
+        print (res.stdout)
+
+
+
+def find_digit(output):
+    match = re.search(r'non-linear constraints: (\d+)', output)
+    if match:
+        constraints = int(match.group(1))
+        # Calculate k such that 2**k > 2 * constraints
+        k = 1
+        while 2**k <= 2 * constraints:
+            k += 1
+        print(f"Constraints: {constraints}, k: {k}")
+        return k
+    else:
+        print("Constraints not found")
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate benchmark result for a given model and testsize.")
 
@@ -646,14 +674,32 @@ if __name__ == "__main__":
 
     output_folder = f'./{args.output}/'
     os.makedirs(output_folder, exist_ok=True)
-    zkey_1 = output_folder + "ceremony/test_0000.zkey"
-    veri_key = output_folder + "ceremony/vk.json"
     target_circom = "_".join(str(x) for x in layers) + '.circom'
 
     command = ['circom', "./golden_circuits/" + target_circom, "--r1cs", "--wasm", "--sym", "-o", output_folder]
+    #command = ['circom', circuit_folder + target_circom, "--r1cs", "--wasm", "--sym", "-o", output_folder]
+    res = subprocess.run(command, capture_output=True, text = True)
+    #print (res.stdout)
+    digit = find_digit(res.stdout)
+
+    zkey_1 = output_folder + f"{str(digit)}/test_0000.zkey"
+    veri_key = output_folder + f"{str(digit)}/vk.json"
+
+    # Check if zkey_1 and veri_key exist
+    if not os.path.exists(zkey_1) or not os.path.exists(veri_key):
+        print ('Start Trusted-setup before performing benchmark')
+        # Call trusted_setup.py if either file does not exist
+        trusted_setup_command = [
+            'python', 'trusted_setup.py',
+            '--model', args.model,
+            '--output', args.output
+        ]
+        subprocess.run(trusted_setup_command)
+
+    update_zkey(output_folder + str(digit)+"/", args.model)
     # subprocess.run(command)
     # sys.exit()
-    _, _, _ = execute_and_monitor(command)
+    # _, _, _ = execute_and_monitor(command)
 
     if layers[0] > 30:
         dnn = True
