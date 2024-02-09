@@ -39,6 +39,7 @@ def find_digit(output):
         print("Constraints not found")
 
 def setup(digit, model_name, output_folder):
+    wrapper_path = './snarkjs_wrapper.js'
     start_time = time.time()
     ceremony_folder = output_folder + f'{str(digit)}/'
     os.makedirs(ceremony_folder, exist_ok=True)
@@ -46,7 +47,7 @@ def setup(digit, model_name, output_folder):
 
     command = ['snarkjs', 'powersoftau', 'new', 'bn128', str(digit), ptau_1,'-v']
     print (command)
-    subprocess.run(command)
+    # subprocess.run(command)
 
 
     ptau_2 = ceremony_folder + 'pot12_0001.ptau'
@@ -59,12 +60,12 @@ def setup(digit, model_name, output_folder):
 
     command = ['snarkjs', 'powersoftau', 'prepare', 'phase2', ptau_2,ptau_3, '-v']
 
-    subprocess.run(command)
+    # subprocess.run(command)
 
 
     r1cs_path = output_folder + model_name + ".r1cs"
     zkey_1 = ceremony_folder + 'test_0000.zkey'
-    command = ['snarkjs', 'groth16', 'setup', r1cs_path, ptau_3, zkey_1]
+    command = ['node', wrapper_path, 'groth16', 'setup', r1cs_path, ptau_3, zkey_1]
     print (command)
     subprocess.run(command)
 
@@ -72,7 +73,7 @@ def setup(digit, model_name, output_folder):
     ptau_2 = ceremony_folder + 'pot12_0001.ptau'
     zkey_2 = ceremony_folder + "test_0001.zkey"
 
-    command = ["snarkjs", "zkey", "contribute", zkey_1, zkey_2, "--name=usr1", "-v"]
+    command = ['node', wrapper_path, "zkey", "contribute", zkey_1, zkey_2, "--name=usr1", "-v"]
     print (command)
     process = subprocess.Popen(command, stdin=subprocess.PIPE, text=True)
     process.communicate(input="1234\n")
@@ -96,7 +97,7 @@ if __name__ == "__main__":
 
     # parser.add_argument('--digit', type =int, help='Specify the max support circuit size 2**digit')
     parser.add_argument('--model', type=str, help='Model file path')
-    parser.add_argument('--output', type=str, default="./tmp/",help='Specify the output folder')
+    parser.add_argument('--output', type=str, default="tmp",help='Specify the output folder')
     
     args = parser.parse_args()
 
