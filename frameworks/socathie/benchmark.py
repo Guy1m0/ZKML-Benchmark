@@ -619,14 +619,15 @@ def show_models():
 
         print (f'model_name: {key} | arch: {arch}')
 
-def update_zkey(ceremony_folder, model_name):
+def update_zkey(ceremony_folder, model_name, output_folder = './tmp/'):
     print ('Update zkey to avoid mismatch in witness and circuit')
     r1cs_path = output_folder + model_name + ".r1cs"
     zkey_1 = ceremony_folder + 'test_0000.zkey'
     ptau_3 = ceremony_folder + 'pot12_final.ptau'
     command = ['snarkjs', 'groth16', 'setup', r1cs_path, ptau_3, zkey_1]
-    #print (command)
+    print (command)
     res = subprocess.run(command, capture_output=True, text = True)
+    print ("afer update")
     if "ERROR" in res.stdout:
         print (res.stdout)
 
@@ -698,8 +699,8 @@ if __name__ == "__main__":
             '--output', args.output
         ]
         subprocess.run(trusted_setup_command)
-    else:
-        update_zkey(output_folder + str(digit)+"/", args.model)
+
+    update_zkey(output_folder + str(digit)+"/", args.model)
     # subprocess.run(command)
     # sys.exit()
     # _, _, _ = execute_and_monitor(command)
