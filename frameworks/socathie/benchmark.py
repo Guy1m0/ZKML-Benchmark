@@ -698,8 +698,8 @@ if __name__ == "__main__":
             '--output', args.output
         ]
         subprocess.run(trusted_setup_command)
-
-    # update_zkey(output_folder + str(digit)+"/", args.model)
+    else:
+        update_zkey(output_folder + str(digit)+"/", args.model)
     # subprocess.run(command)
     # sys.exit()
     # _, _, _ = execute_and_monitor(command)

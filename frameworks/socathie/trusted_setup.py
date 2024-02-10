@@ -17,11 +17,6 @@ arch_folders = {"28_6_16_10_5": "input-conv2d-conv2d-dense/",
                 "14_5_11_80_10_3": "input-conv2d-conv2d-dense-dense/",
                 "28_6_16_120_84_10_5": "input-conv2d-conv2d-dense-dense-dense/"}
 
-import subprocess
-import concurrent.futures
-import psutil
-import time
-
 def monitor_memory(pid, freq=0.01):
     p = psutil.Process(pid)
     max_memory = 0
@@ -182,8 +177,8 @@ if __name__ == "__main__":
         "Model Name": [args.model], 
         "Non-Linear Constraints": [constraints], 
         "Digits": [digit], 
-        "Time Cost": [time_cost], 
-        "Memory Required": [mem_cost]
+        "Time Cost (s)": [time_cost], 
+        "Memory Required (MB)": [mem_cost]
     }
 
     new_row_df = pd.DataFrame(new_row)
