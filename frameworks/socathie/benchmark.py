@@ -366,7 +366,7 @@ def benchmark(test_images, predictions, weights, biases, layers, model_name, tmp
     wit_json_file = json_folder + "generate_witness.js"
     wasm_file = json_folder + target_circom[:-7] + ".wasm"
     input_path = tmp_folder + "input.json"
-    wit_file = tmp_folder + "witness.wtns"
+    wit_file = tmp_folder + target_circom[:-7] + "_witness.wtns"
 
     mem_usage = []
     time_cost = []
@@ -408,8 +408,11 @@ def benchmark(test_images, predictions, weights, biases, layers, model_name, tmp
 
         for command in commands:
             stdout, _, usage = execute_and_monitor(command)
+            print ('command:', command)
+            print (stdout)
+
             if "ERROR" in stdout:
-                #print ('command:', command)
+                print ('command:', command)
 
                 print (stdout)
                 return
@@ -502,6 +505,8 @@ def benchmark_(test_images, predictions, weights, biases, layers, model_name, tm
 
         for command in commands:
             stdout, _, usage = execute_and_monitor(command)
+            print ('command:', command)
+            print (stdout)
             if "ERROR" in stdout:
                 #print ('command:', command)
                 print (stdout)
@@ -547,7 +552,7 @@ def benchmark_cnn(test_images, predictions, layers, model_name, tmp_folder, inpu
     wit_json_file = json_folder + "generate_witness.js"
     wasm_file = json_folder + target_circom[:-7] + ".wasm"
     input_path = tmp_folder + "input.json"
-    wit_file = tmp_folder + "witness.wtns"
+    wit_file = tmp_folder + target_circom[:-7] + "_witness.wtns"
 
     mem_usage = []
     time_cost = []
@@ -570,6 +575,8 @@ def benchmark_cnn(test_images, predictions, layers, model_name, tmp_folder, inpu
 
         for command in commands:
             stdout, _, usage = execute_and_monitor(command)
+            print ('command:', command)
+            print (stdout)
             if "ERROR" in stdout:
                 print (stdout)
                 return
