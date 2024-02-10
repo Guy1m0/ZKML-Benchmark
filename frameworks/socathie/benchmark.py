@@ -179,82 +179,113 @@ def AveragePooling2DInt (nRows, nCols, nChannels, poolSize, strides, input):
                 out[i][j][k] = str(out[i][j][k] // poolSize**2 % p)
     return Input, out, remainder
 
-def prepare_input_json_cnn(X, layers, input_path):
+def DenseInt_(nInputs, nOutputs, n, input, weights, bias):
+    Input = [str(input[i] % p) for i in range(nInputs)]
+    Weights = [[str(weights[i][j] % p) for j in range(nOutputs)] for i in range(nInputs)]
+    Bias = [str(bias[i] % p) for i in range(nOutputs)]
+    out = [0 for _ in range(nOutputs)]
+    remainder = [None for _ in range(nOutputs)]
+    for j in range(nOutputs):
+        for i in range(nInputs):
+            out[j] += input[i] * weights[i][j]
+        out[j] += bias[j]
+        remainder[j] = str(out[j] % n)
+        out[j] = str(out[j] // n % p)
+    return Input, Weights, Bias, out, remainder
+
+def prepare_input_json_cnn(X, layers, input_path, scalar = 18):
     kernal_size = layers[-1]
-    X_in = [[[int(X[i][j][0]*1e18)] for j in range(layers[0])] for i in range(layers[0])]
-    conv2d_1_weights = [[[[int(model.layers[1].weights[0][i][j][k][l]*1e18) for l in range(layers[1])] for k in range(1)] for j in range(kernal_size)] for i in range(kernal_size)]
-    conv2d_1_bias = [int(model.layers[1].weights[1][i]*1e36) for i in range(layers[1])]
+    
+    X_in = [[[int(X[i][j][0]*(10 ** scalar))] for j in range(layers[0])] for i in range(layers[0])]
+    conv2d_1_weights = [[[[int(model.layers[1].weights[0][i][j][k][l]*(10 ** scalar)) for l in range(layers[1])] for k in range(1)] for j in range(kernal_size)] for i in range(kernal_size)]
+    conv2d_1_bias = [int(model.layers[1].weights[1][i]*(10 ** (2 * scalar))) for i in range(layers[1])]
 
     X_in, conv2d_1_weights, conv2d_1_bias, conv2d_1_out, conv2d_1_remainder = Conv2DInt(layers[0], layers[0], 1, layers[1], kernal_size, 1, 10**18, X_in, conv2d_1_weights, conv2d_1_bias)
 
-    relu_1_in = [[[int(conv2d_1_out[i][j][k]) for k in range(5)] for j in range(12)] for i in range(12)]
-    relu_1_out = [[[str(relu_1_in[i][j][k]) if relu_1_in[i][j][k] < p//2 else 0 for k in range(5)] for j in range(12)] for i in range(12)]
+    out_conv2d_1 = layers[0] - kernal_size + 1
+    relu_1_in = [[[int(conv2d_1_out[i][j][k]) for k in range(layers[1])] for j in range(out_conv2d_1)] for i in range(out_conv2d_1)]
+    relu_1_out = [[[str(relu_1_in[i][j][k]) if relu_1_in[i][j][k] < p//2 else 0 for k in range(layers[1])] for j in range(out_conv2d_1)] for i in range(out_conv2d_1)]
 
-    avg2d_1_in = [[[int(relu_1_out[i][j][k]) for k in range(5)] for j in range(12)] for i in range(12)]
+    avg2d_1_in = [[[int(relu_1_out[i][j][k]) for k in range(layers[1])] for j in range(out_conv2d_1)] for i in range(out_conv2d_1)]
 
-    _, avg2d_1_out, avg2d_1_remainder = AveragePooling2DInt(12, 12, 5, 2, 2, avg2d_1_in)
+    _, avg2d_1_out, avg2d_1_remainder = AveragePooling2DInt(out_conv2d_1, out_conv2d_1, layers[1], 2, 2, avg2d_1_in)
+
+    out_conv2d_1 = int(out_conv2d_1/2)
+    #print (model.layers[4].weights[0])
+    conv2d_2_in = [[[int(avg2d_1_out[i][j][k]) for k in range(layers[1])] for j in range(out_conv2d_1)] for i in range(out_conv2d_1)]
+    conv2d_2_weights = [[[[int(model.layers[4].weights[0][i][j][k][l]*(10 ** scalar)) for l in range(layers[2])] for k in range(layers[1])] for j in range(kernal_size)] for i in range(kernal_size)]
+    conv2d_2_bias = [int(model.layers[4].weights[1][i]*(10 ** (scalar * 2))) for i in range(layers[2])]
+
+    _, conv2d_2_weights, conv2d_2_bias, conv2d_2_out, conv2d_2_remainder = Conv2DInt(out_conv2d_1, out_conv2d_1, layers[1], layers[2], kernal_size, 1, 10**scalar, conv2d_2_in, conv2d_2_weights, conv2d_2_bias)
+
+    out_conv2d_2 = out_conv2d_1 - kernal_size + 1
+    relu_2_in = [[[int(conv2d_2_out[i][j][k]) for k in range(layers[2])] for j in range(out_conv2d_2)] for i in range(out_conv2d_2)]
+    relu_2_out = [[[str(relu_2_in[i][j][k]) if relu_2_in[i][j][k] < p//2 else 0 for k in range(layers[2])] for j in range(out_conv2d_2)] for i in range(out_conv2d_2)]
 
 
-    conv2d_2_in = [[[int(avg2d_1_out[i][j][k]) for k in range(5)] for j in range(6)] for i in range(6)]
-    conv2d_2_weights = [[[[int(model.layers[4].weights[0][i][j][k][l]*1e18) for l in range(11)] for k in range(5)] for j in range(kernal_size)] for i in range(kernal_size)]
-    conv2d_2_bias = [int(model.layers[4].weights[1][i]*1e36) for i in range(11)]
+    avg2d_2_in = [[[int(relu_2_out[i][j][k]) if int(relu_2_out[i][j][k]) < p//2 else int(relu_2_out[i][j][k]) - p for k in range(layers[2])] for j in range(out_conv2d_2)] for i in range(out_conv2d_2)]
 
-    _, conv2d_2_weights, conv2d_2_bias, conv2d_2_out, conv2d_2_remainder = Conv2DInt(6, 6, 5, 11, 3, 1, 10**18, conv2d_2_in, conv2d_2_weights, conv2d_2_bias)
+    _, avg2d_2_out, avg2d_2_remainder = AveragePooling2DInt(out_conv2d_2, out_conv2d_2, layers[2], 2, 2, avg2d_2_in)
 
+    out_conv2d_2 = int(out_conv2d_2/2)
+    flatten_out = [avg2d_2_out[i][j][k] for i in range(out_conv2d_2) for j in range(out_conv2d_2) for k in range(layers[2])]
 
-    relu_2_in = [[[int(conv2d_2_out[i][j][k]) for k in range(11)] for j in range(4)] for i in range(4)]
-    relu_2_out = [[[str(relu_2_in[i][j][k]) if relu_2_in[i][j][k] < p//2 else 0 for k in range(11)] for j in range(4)] for i in range(4)]
+    out_flat = out_conv2d_2 ** 2 * layers[2]
 
+    dense_in = [int(flatten_out[i]) if int(flatten_out[i]) < p//2 else int(flatten_out[i]) - p for i in range(out_flat)]
+    dense_weights = [[int(model.layers[8].weights[0][i][j]*(10 ** scalar)) for j in range(layers[3])] for i in range(out_flat)]
+    dense_bias = [int(model.layers[8].weights[1][i]*(10 ** (scalar * 2))) for i in range(layers[3])]
 
-    avg2d_2_in = [[[int(relu_2_out[i][j][k]) if int(relu_2_out[i][j][k]) < p//2 else int(relu_2_out[i][j][k]) - p for k in range(11)] for j in range(4)] for i in range(4)]
+    _, dense_weights, dense_bias, dense_out, dense_remainder = DenseInt_(out_flat, layers[3], 10**scalar, dense_in, dense_weights, dense_bias)
 
-    _, avg2d_2_out, avg2d_2_remainder = AveragePooling2DInt(4, 4, 11, 2, 2, avg2d_2_in)
-
-    flatten_out = [avg2d_2_out[i][j][k] for i in range(2) for j in range(2) for k in range(11)]
-
-    dense_in = [int(flatten_out[i]) if int(flatten_out[i]) < p//2 else int(flatten_out[i]) - p for i in range(44)]
-    dense_weights = [[int(model.layers[8].weights[0][i][j]*1e18) for j in range(80)] for i in range(44)]
-    dense_bias = [int(model.layers[8].weights[1][i]*1e36) for i in range(80)]
-
-    _, dense_weights, dense_bias, dense_out, dense_remainder = DenseInt(44, 80, 10**18, dense_in, dense_weights, dense_bias)
-
-    dense_1_weights = [[int(model.layers[10].weights[0][i][j]*1e18) for j in range(10)] for i in range(80)]
-    dense_1_bias = [int(model.layers[10].weights[1][i]*1e36) for i in range(10)]
-
-    re_lu_3_out = [dense_out[i] if int(dense_out[i]) < p//2 else 0 for i in range(80)]
-    dense_1_in = [int(re_lu_3_out[i]) for i in range(80)]
-
-    _, dense_1_weights, dense_1_bias, dense_1_out, dense_1_remainder = DenseInt(80, 10, 10**18, dense_1_in, dense_1_weights, dense_1_bias)
 
     in_json = {
         "in": X_in,
-        "conv2d_2_weights": conv2d_1_weights,
-        "conv2d_2_bias": conv2d_1_bias,
-        "conv2d_2_out": conv2d_1_out,
-        "conv2d_2_remainder": conv2d_1_remainder,
-        "re_lu_1_out": relu_1_out,
-        "average_pooling2d_1_out": avg2d_1_out,
-        "average_pooling2d_1_remainder": avg2d_1_remainder,
-        "conv2d_3_weights": conv2d_2_weights,
-        "conv2d_3_bias": conv2d_2_bias,
-        "conv2d_3_out": conv2d_2_out,
-        "conv2d_3_remainder": conv2d_2_remainder,
-        "re_lu_2_out": relu_2_out,
-        "average_pooling2d_2_out": avg2d_2_out,
-        "average_pooling2d_2_remainder": avg2d_2_remainder,
+        "conv2d_weights": conv2d_1_weights,
+        "conv2d_bias": conv2d_1_bias,
+        "conv2d_out": conv2d_1_out,
+        "conv2d_remainder": conv2d_1_remainder,
+        "conv2d_re_lu_out": relu_1_out,
+        "average_pooling2d_out": avg2d_1_out,
+        "average_pooling2d_remainder": avg2d_1_remainder,
+        "conv2d_1_weights": conv2d_2_weights,
+        "conv2d_1_bias": conv2d_2_bias,
+        "conv2d_1_out": conv2d_2_out,
+        "conv2d_1_remainder": conv2d_2_remainder,
+        "conv2d_1_re_lu_out": relu_2_out,
+        "average_pooling2d_1_out": avg2d_2_out,
+        "average_pooling2d_1_remainder": avg2d_2_remainder,
         "flatten_out": flatten_out,
         "dense_weights": dense_weights,
         "dense_bias": dense_bias,
         "dense_out": dense_out,
-        "dense_remainder": dense_remainder,
-        "re_lu_3_out":re_lu_3_out,
-        "dense_1_weights":dense_1_weights,
-        "dense_1_bias":dense_1_bias,
-        "dense_1_out":dense_1_out,
-        "dense_1_remainder":dense_1_remainder
+        "dense_remainder": dense_remainder
     }
 
-    out = [int(x) for x in dense_1_out]
+    out = [int(x) for x in dense_out]
+
+    if len(layers) == 6:
+        dense_1_weights = [[int(model.layers[10].weights[0][i][j]*(10**scalar)) for j in range(10)] for i in range(layers[3])]
+        dense_1_bias = [int(model.layers[10].weights[1][i]*(10**(scalar * 2))) for i in range(10)]
+
+        re_lu_3_out = [dense_out[i] if int(dense_out[i]) < p//2 else 0 for i in range(layers[3])]
+        dense_1_in = [int(re_lu_3_out[i]) for i in range(layers[3])]
+
+        _, dense_1_weights, dense_1_bias, dense_1_out, dense_1_remainder = DenseInt_(layers[3], layers[4], 10**scalar, dense_1_in, dense_1_weights, dense_1_bias)
+
+        #dense_1_out = [str(x) for x in dense_1_out]
+
+        new_entries = {
+            "dense_re_lu_out":re_lu_3_out,
+            "dense_1_weights":dense_1_weights,
+            "dense_1_bias":dense_1_bias,
+            "dense_1_out":dense_1_out,
+            "dense_1_remainder":dense_1_remainder
+        }
+        # Append new entries to in_json
+        in_json.update(new_entries)
+        out = [int(x) for x in dense_1_out]
+
     out = [x if x < p//2 else 0 for x in out]
     pred = np.argmax(out)
 
@@ -268,6 +299,16 @@ def prepare(model, layers):
         _, test_images = dnn_datasets()
     elif layers[0] == 784:
         test_images, _ = dnn_datasets()
+
+    predictions_tf = get_predictions_tf(model, test_images)
+
+    return predictions_tf, test_images
+
+def prepare_cnn(model, layers):
+    if layers[0] == 14:
+        _, test_images = cnn_datasets()
+    elif layers[0] == 28:
+        test_images, _ = cnn_datasets()
 
     predictions_tf = get_predictions_tf(model, test_images)
 
@@ -327,8 +368,11 @@ def gen_model_cnn(layers, model_in_path):
     out = tf.keras.layers.AveragePooling2D()(out)
     out = tf.keras.layers.Flatten()(out)
     out = tf.keras.layers.Dense(layers[3])(out)
-    out = tf.keras.layers.ReLU()(out)
-    out = tf.keras.layers.Dense(layers[4])(out)
+
+    if len(layers) == 6:
+        out = tf.keras.layers.ReLU()(out)
+        out = tf.keras.layers.Dense(layers[4])(out)
+
     model = tf.keras.Model(inputs, out)
 
     model.load_weights(model_in_path)
@@ -366,7 +410,7 @@ def benchmark(test_images, predictions, weights, biases, layers, model_name, tmp
     wit_json_file = json_folder + "generate_witness.js"
     wasm_file = json_folder + target_circom[:-7] + ".wasm"
     input_path = tmp_folder + "input.json"
-    wit_file = tmp_folder + target_circom[:-7] + "_witness.wtns"
+    wit_file = tmp_folder + "witness.wtns"
 
     mem_usage = []
     time_cost = []
@@ -393,23 +437,34 @@ def benchmark(test_images, predictions, weights, biases, layers, model_name, tmp
             "Dense21remainder": dense_remainders[1]
         }
 
+        if len(layers) == 4:
+            new_entries = {
+                "ReLUout2": relu_outs[1],
+                "Dense10weights": dense_weights[2],
+                "Dense10bias": dense_biases[2],
+                "Dense10out": dense_outs[2],
+                "Dense10remainder": dense_remainders[2]
+            }
+            # Append new entries to in_json
+            in_json.update(new_entries)
+
         with open(input_path, "w") as f:
             json.dump(in_json, f)
 
         if pred != predictions[i]:
             loss += 1
             print ("Loss happens on index", i)
-        # print ('wit:', wit_json_file)
-        # print ('input:', input_path)
-        # print ('target:', target_circom)
+
+        # command = ['node', wit_json_file, wasm_file, input_path, wit_file]
+        # subprocess.run(command)
         commands = [['node', wit_json_file, wasm_file, input_path, wit_file],
                     ['snarkjs', 'groth16', 'prove', zkey, wit_file, tmp_folder+'proof.json', tmp_folder+'public.json']]
                     #['snarkjs', 'groth16', 'verify',veri_key, tmp_folder+'public.json', tmp_folder+'proof.json']]
 
         for command in commands:
             stdout, _, usage = execute_and_monitor(command)
-            print ('command:', command)
-            print (stdout)
+            # print ('command:', command)
+            # print (stdout)
 
             if "ERROR" in stdout:
                 print ('command:', command)
@@ -417,107 +472,14 @@ def benchmark(test_images, predictions, weights, biases, layers, model_name, tmp
                 print (stdout)
                 return
             cost += usage
-            # subprocess.run(command)
-        #print ("stdout:", stdout)
+            subprocess.run(command)
+        # print ("stdout:", stdout)
             
         mem_usage.append(cost)
         time_cost.append(time.time() - start_time)
     
     print ("Total time:", time.time() - benchmark_start_time)
 
-    layers = model_name.split("_")
-    new_row = {
-        'Framework': ['circomlib-ml (tensorflow)'],
-        'Architecture': [f'{arch_folder} ({"x".join(layers)})'],
-        '# Layers': [len(layers)],
-        '# Parameters': [params[model_name]],
-        'Testing Size': [len(mem_usage)],
-        'Accuracy Loss (%)': [loss/len(mem_usage) * 100],
-        'Avg Memory Usage (MB)': [sum(mem_usage) / len(mem_usage)],
-        'Std Memory Usage': [pd.Series(mem_usage).std()],
-        'Avg Proving Time (s)': [sum(time_cost) / len(time_cost)],
-        'Std Proving Time': [pd.Series(time_cost).std()]
-    }
-
-    new_row_df = pd.DataFrame(new_row)
-    print (new_row_df)
-
-    if save:
-        df = load_csv()
-        df = pd.concat([df, new_row_df], ignore_index=True)
-        csv_path = '../../benchmarks/benchmark_results.csv'
-        df.to_csv(csv_path, index=False)
-
-    return
-
-def benchmark_(test_images, predictions, weights, biases, layers, model_name, tmp_folder, input_path, zkey, veri_key, save=False):
-    loss = 0
-
-    target_circom = "_".join(str(x) for x in layers) + '.circom'
-
-    json_folder = tmp_folder + target_circom[:-7] + "_js/"
-    wit_json_file = json_folder + "generate_witness.js"
-    wasm_file = json_folder + target_circom[:-7] + ".wasm"
-    input_path = tmp_folder + "input.json"
-    wit_file = tmp_folder + target_circom[:-7] + "_witness.wtns"
-
-    mem_usage = []
-    time_cost = []
-    benchmark_start_time = time.time()
-
-    for i in range(len(test_images)):
-        cost = 0
-        X = test_images[i:i+1]
-        print ("process for image ",i)
-        start_time = time.time()
-        X_in = [int(x*1e36) for x in X[0]]
-        x_in, dense_weights, dense_biases, dense_outs, dense_remainders, relu_outs, pred = prepare_input_json(layers, weights, biases, X_in, scalar=36, relu=True)
-
-
-        in_json = {
-            "in": x_in,
-            "Dense32weights": dense_weights[0],
-            "Dense32bias": dense_biases[0],
-            "Dense32out": dense_outs[0],
-            "Dense32remainder": dense_remainders[0],
-            "ReLUout": relu_outs[0], 
-            "Dense21weights": dense_weights[1],
-            "Dense21bias": dense_biases[1],
-            "Dense21out": dense_outs[1],
-            "Dense21remainder": dense_remainders[1],
-            "ReLUout2": relu_outs[1],
-            "Dense10weights": dense_weights[2],
-            "Dense10bias": dense_biases[2],
-            "Dense10out": dense_outs[2],
-            "Dense10remainder": dense_remainders[2]
-        }
-
-        with open(input_path, "w") as f:
-            json.dump(in_json, f)
-
-        if pred != predictions[i]:
-            loss += 1
-            print ("Loss happens on index", i)
-
-        commands = [['node', wit_json_file, wasm_file, input_path, wit_file],
-                    ['snarkjs', 'groth16', 'prove',zkey, wit_file, tmp_folder+'proof.json', tmp_folder+'public.json']]
-                    #['snarkjs', 'groth16', 'verify',veri_key, tmp_folder+'public.json', tmp_folder+'proof.json']]
-
-        for command in commands:
-            stdout, _, usage = execute_and_monitor(command)
-            print ('command:', command)
-            print (stdout)
-            if "ERROR" in stdout:
-                #print ('command:', command)
-                print (stdout)
-                return
-            cost += usage
-        #print ("stdout:", stdout)
-            
-        mem_usage.append(cost)
-        time_cost.append(time.time() - start_time)
-    
-    print ("Total time:", time.time() - benchmark_start_time)
     layers = model_name.split("_")
     new_row = {
         'Framework': ['circomlib-ml (tensorflow)'],
@@ -552,7 +514,7 @@ def benchmark_cnn(test_images, predictions, layers, model_name, tmp_folder, inpu
     wit_json_file = json_folder + "generate_witness.js"
     wasm_file = json_folder + target_circom[:-7] + ".wasm"
     input_path = tmp_folder + "input.json"
-    wit_file = tmp_folder + target_circom[:-7] + "_witness.wtns"
+    wit_file = tmp_folder + "witness.wtns"
 
     mem_usage = []
     time_cost = []
@@ -569,19 +531,21 @@ def benchmark_cnn(test_images, predictions, layers, model_name, tmp_folder, inpu
             loss += 1
             print ("Loss happens on index", i)
 
+        # command = ['node', wit_json_file, wasm_file, input_path, wit_file]
+        # subprocess.run(command)
         commands = [['node', wit_json_file, wasm_file, input_path, wit_file],
                     ['snarkjs', 'groth16', 'prove',zkey, wit_file, tmp_folder+'proof.json', tmp_folder+'public.json']]
                     #['snarkjs', 'groth16', 'verify',veri_key, tmp_folder+'public.json', tmp_folder+'proof.json']]
 
         for command in commands:
             stdout, _, usage = execute_and_monitor(command)
-            print ('command:', command)
-            print (stdout)
+            # print ('command:', command)
+            # print (stdout)
             if "ERROR" in stdout:
                 print (stdout)
                 return
             cost += usage
-        #print ("stdout:", stdout)
+        # print ("stdout:", stdout)
             
         mem_usage.append(cost)
         time_cost.append(time.time() - start_time)
@@ -632,9 +596,9 @@ def update_zkey(ceremony_folder, model_name, output_folder = './tmp/'):
     zkey_1 = ceremony_folder + 'test_0000.zkey'
     ptau_3 = ceremony_folder + 'pot12_final.ptau'
     command = ['snarkjs', 'groth16', 'setup', r1cs_path, ptau_3, zkey_1]
-    print (command)
+    # print (command)
     res = subprocess.run(command, capture_output=True, text = True)
-    print ("afer update")
+    # print ("afer update")
     if "ERROR" in res.stdout:
         print (res.stdout)
 
@@ -688,7 +652,6 @@ if __name__ == "__main__":
     target_circom = "_".join(str(x) for x in layers) + '.circom'
 
     command = ['circom', "./golden_circuits/" + target_circom, "--r1cs", "--wasm", "--sym", "-o", output_folder]
-    #command = ['circom', circuit_folder + target_circom, "--r1cs", "--wasm", "--sym", "-o", output_folder]
     res = subprocess.run(command, capture_output=True, text = True)
     print (res.stdout)
     digit = find_digit(res.stdout)
@@ -707,10 +670,8 @@ if __name__ == "__main__":
         ]
         subprocess.run(trusted_setup_command)
 
-    update_zkey(output_folder + str(digit)+"/", args.model)
-    # subprocess.run(command)
-    # sys.exit()
-    # _, _, _ = execute_and_monitor(command)
+    if digit == 16:
+        update_zkey(output_folder + str(digit)+"/", args.model)
 
     if layers[0] > 30:
         dnn = True
@@ -727,13 +688,9 @@ if __name__ == "__main__":
         predicted_labels, tests = prepare(model, layers)
         weights, biases = transfer_weights(layers, model, 36)
 
-        if len(layers)==3:
-            benchmark(tests[:args.size], predicted_labels[:args.size], weights, biases,
+        benchmark(tests[:args.size], predicted_labels[:args.size], weights, biases,
                   layers, args.model, output_folder, output_folder+"input.json", zkey_1, veri_key, save=args.save)
-        if len(layers)==4:
-            #print ("other")
-            benchmark_(tests[:args.size], predicted_labels[:args.size], weights, biases,
-                  layers, args.model, output_folder, output_folder+"input.json", zkey_1, veri_key, save=args.save)
+       
     else:
         arch_folder = arch_folders[args.model]
         model_path = "../../models/"
@@ -741,9 +698,7 @@ if __name__ == "__main__":
 
         model = gen_model_cnn(layers, model_in_path)
 
-        _, tests = cnn_datasets()
-
-        predicted_labels = get_predictions_tf(model, tests)
+        predicted_labels, tests = prepare_cnn(model, layers)
 
         benchmark_cnn(tests[:args.size], predicted_labels[:args.size], 
                 layers, args.model, output_folder, output_folder+"input.json", zkey_1, veri_key, save=args.save)

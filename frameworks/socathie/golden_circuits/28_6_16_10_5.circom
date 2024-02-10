@@ -12,20 +12,28 @@ signal input conv2d_weights[5][5][1][6];
 signal input conv2d_bias[6];
 signal input conv2d_out[24][24][6];
 signal input conv2d_remainder[24][24][6];
+
 signal input conv2d_re_lu_out[24][24][6];
+
 signal input average_pooling2d_out[12][12][6];
 signal input average_pooling2d_remainder[12][12][6];
+
 signal input conv2d_1_weights[5][5][6][16];
 signal input conv2d_1_bias[16];
 signal input conv2d_1_out[8][8][16];
 signal input conv2d_1_remainder[8][8][16];
+
 signal input conv2d_1_re_lu_out[8][8][16];
+
 signal input average_pooling2d_1_out[4][4][16];
 signal input average_pooling2d_1_remainder[4][4][16];
+
 signal input flatten_out[256];
+
 signal input dense_weights[256][10];
 signal input dense_bias[10];
 signal input dense_out[10];
+
 signal output out[10];
 signal input dense_remainder[10];
 
