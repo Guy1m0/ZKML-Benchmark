@@ -78,7 +78,8 @@ def setup(digit, model_name, output_folder):
     mem_usage = 0
     wrapper_path = './snarkjs_wrapper.js'
     start_time = time.time()
-    ceremony_folder = output_folder + f'{str(digit)}/'
+    ceremony_folder = output_folder + f'ceremony-{model_name}/'
+
     os.makedirs(ceremony_folder, exist_ok=True)
     ptau_1 = ceremony_folder + 'pot12_0000.ptau'
 

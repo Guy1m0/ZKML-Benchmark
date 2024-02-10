@@ -401,7 +401,7 @@ def load_csv():
     df = pd.read_csv(csv_path)
     return df
 
-def benchmark(test_images, predictions, weights, biases, layers, model_name, tmp_folder, input_path, zkey, veri_key, save=False):
+def benchmark(test_images, predictions, weights, biases, layers, model_name, tmp_folder, input_path, zkey, veri_key, verify = False, save=False):
     loss = 0
 
     target_circom = "_".join(str(x) for x in layers) + '.circom'
@@ -422,7 +422,7 @@ def benchmark(test_images, predictions, weights, biases, layers, model_name, tmp
         print ("process for image ",i)
         start_time = time.time()
         X_in = [int(x*1e36) for x in X[0]]
-        x_in, dense_weights, dense_biases, dense_outs, dense_remainders, relu_outs, pred = prepare_input_json(layers, weights, biases, X_in, scalar=36, relu=True)
+        x_in, dense_weights, dense_biases, dense_outs, dense_remainders, relu_outs, _ = prepare_input_json(layers, weights, biases, X_in, scalar=36, relu=True)
 
         in_json = {
             "in": x_in,
@@ -451,15 +451,10 @@ def benchmark(test_images, predictions, weights, biases, layers, model_name, tmp
         with open(input_path, "w") as f:
             json.dump(in_json, f)
 
-        if pred != predictions[i]:
-            loss += 1
-            print ("Loss happens on index", i)
 
-        # command = ['node', wit_json_file, wasm_file, input_path, wit_file]
-        # subprocess.run(command)
+
         commands = [['node', wit_json_file, wasm_file, input_path, wit_file],
                     ['snarkjs', 'groth16', 'prove', zkey, wit_file, tmp_folder+'proof.json', tmp_folder+'public.json']]
-                    #['snarkjs', 'groth16', 'verify',veri_key, tmp_folder+'public.json', tmp_folder+'proof.json']]
 
         for command in commands:
             stdout, _, usage = execute_and_monitor(command)
@@ -468,13 +463,22 @@ def benchmark(test_images, predictions, weights, biases, layers, model_name, tmp
 
             if "ERROR" in stdout:
                 print ('command:', command)
-
                 print (stdout)
                 return
             cost += usage
+
+        if verify:
+            command = ['snarkjs', 'groth16', 'verify',veri_key, tmp_folder+'public.json', tmp_folder+'proof.json']
             subprocess.run(command)
-        # print ("stdout:", stdout)
-            
+
+        out = load_and_convert_json_to_int(tmp_folder+'public.json')
+        out = [x if x < p//2 else 0 for x in out]
+        pred = np.argmax(out)
+
+        if pred != predictions[i]:
+            loss += 1
+            print ("Loss happens on index", i)
+
         mem_usage.append(cost)
         time_cost.append(time.time() - start_time)
     
@@ -505,7 +509,7 @@ def benchmark(test_images, predictions, weights, biases, layers, model_name, tmp
 
     return
 
-def benchmark_cnn(test_images, predictions, layers, model_name, tmp_folder, input_path, zkey, veri_key, save=False):
+def benchmark_cnn(test_images, predictions, layers, model_name, tmp_folder, input_path, zkey, veri_key, save=False, verify = False):
     loss = 0
 
     target_circom = "_".join(str(x) for x in layers) + '.circom'
@@ -525,17 +529,12 @@ def benchmark_cnn(test_images, predictions, layers, model_name, tmp_folder, inpu
         cost = 0
         X = test_images[i]
         start_time = time.time()
-        pred = prepare_input_json_cnn(X, layers, input_path)
-
-        if pred != predictions[i]:
-            loss += 1
-            print ("Loss happens on index", i)
+        _ = prepare_input_json_cnn(X, layers, input_path)
 
         # command = ['node', wit_json_file, wasm_file, input_path, wit_file]
         # subprocess.run(command)
         commands = [['node', wit_json_file, wasm_file, input_path, wit_file],
                     ['snarkjs', 'groth16', 'prove',zkey, wit_file, tmp_folder+'proof.json', tmp_folder+'public.json']]
-                    #['snarkjs', 'groth16', 'verify',veri_key, tmp_folder+'public.json', tmp_folder+'proof.json']]
 
         for command in commands:
             stdout, _, usage = execute_and_monitor(command)
@@ -545,8 +544,20 @@ def benchmark_cnn(test_images, predictions, layers, model_name, tmp_folder, inpu
                 print (stdout)
                 return
             cost += usage
+
+        if verify:
+            command = ['snarkjs', 'groth16', 'verify',veri_key, tmp_folder+'public.json', tmp_folder+'proof.json']
+            subprocess.run(command)
         # print ("stdout:", stdout)
             
+        out = load_and_convert_json_to_int(tmp_folder+'public.json')
+        out = [x if x < p//2 else 0 for x in out]
+        pred = np.argmax(out)
+
+        if pred != predictions[i]:
+            loss += 1
+            print ("Loss happens on index", i)
+
         mem_usage.append(cost)
         time_cost.append(time.time() - start_time)
 
@@ -602,6 +613,25 @@ def update_zkey(ceremony_folder, model_name, output_folder = './tmp/'):
     if "ERROR" in res.stdout:
         print (res.stdout)
 
+# Function to load JSON content and convert it to a list of integers
+def load_and_convert_json_to_int(file_path):
+    try:
+        # Open and read the JSON file
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+        
+        # Convert each string in the list to an integer
+        int_list = [int(item) for item in data]
+        
+        return int_list
+    except FileNotFoundError:
+        print(f"File not found: {file_path}")
+    except json.JSONDecodeError:
+        print(f"Error decoding JSON from file: {file_path}")
+    except ValueError:
+        print("Error converting string to int.")
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
 
 
 def find_digit(output):
@@ -625,6 +655,7 @@ if __name__ == "__main__":
     show_group.add_argument('--list', action='store_true', help='Show list of supported models and exit')
 
     parser.add_argument('--save', action='store_true', help='Flag to indicate if save results')
+    parser.add_argument('--debug', action='store_true', help='Flag to indicate if verify proofs')
 
     parser.add_argument('--size', type=int, help='Test Size')
     parser.add_argument('--model', type=str, help='Model file path')
@@ -654,10 +685,10 @@ if __name__ == "__main__":
     command = ['circom', "./golden_circuits/" + target_circom, "--r1cs", "--wasm", "--sym", "-o", output_folder]
     res = subprocess.run(command, capture_output=True, text = True)
     print (res.stdout)
-    digit = find_digit(res.stdout)
+    # digit = find_digit(res.stdout)
 
-    zkey_1 = output_folder + f"{str(digit)}/test_0000.zkey"
-    veri_key = output_folder + f"{str(digit)}/vk.json"
+    zkey_1 = output_folder + f"ceremony-{args.model}/test_0000.zkey"
+    veri_key = output_folder + f"ceremony-{args.model}/vk.json"
 
     # Check if zkey_1 and veri_key exist
     if not os.path.exists(zkey_1) or not os.path.exists(veri_key):
@@ -669,9 +700,6 @@ if __name__ == "__main__":
             '--output', args.output
         ]
         subprocess.run(trusted_setup_command)
-
-    if digit == 16:
-        update_zkey(output_folder + str(digit)+"/", args.model)
 
     if layers[0] > 30:
         dnn = True
@@ -689,7 +717,7 @@ if __name__ == "__main__":
         weights, biases = transfer_weights(layers, model, 36)
 
         benchmark(tests[:args.size], predicted_labels[:args.size], weights, biases,
-                  layers, args.model, output_folder, output_folder+"input.json", zkey_1, veri_key, save=args.save)
+                  layers, args.model, output_folder, output_folder+"input.json", zkey_1, veri_key, verify=args.debug, save=args.save)
        
     else:
         arch_folder = arch_folders[args.model]
@@ -701,4 +729,4 @@ if __name__ == "__main__":
         predicted_labels, tests = prepare_cnn(model, layers)
 
         benchmark_cnn(tests[:args.size], predicted_labels[:args.size], 
-                layers, args.model, output_folder, output_folder+"input.json", zkey_1, veri_key, save=args.save)
+                layers, args.model, output_folder, output_folder+"input.json", zkey_1, veri_key, verify=args.debug, save=args.save)
