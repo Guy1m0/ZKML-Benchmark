@@ -24,10 +24,6 @@ In today's rapidly growing zero-knowledge machine learning (zkML) areas, innovat
 # Codebases
 A shortlist of keeping updated projects
 
-> LinearA hasn't updated since Nov 2022
-> zkCNN only updated till Feb 2023
-> zator till May 2023
-
 ## Active 
 
 * EZKL: [repo](https://github.com/zkonduit/ezkl)
