@@ -77,6 +77,10 @@ Through this detailed benchmarking process, we aim to provide a nuanced understa
 
 # Results
 
+1. overall results (proving time and memory usage) among each frameworks on same MLP
+2. Sum of accuracy loss for each MLP, mark by different color
+3. Discussion of sacle factor
+
 ## DNN
 
 

@@ -157,7 +157,12 @@ def benchmark_dnn(test_images, predictions, model, model_name, mode = "resources
         # stdout = "1234"
         # usage = 1
         stdout, _, usage = execute_and_monitor(command)
-        pred = int(stdout[-2])
+
+        try:
+            pred = int(stdout[-2])
+        except ValueError:
+            print(f"Failed to convert {stdout[-2]} to int. Full output: {stdout}")
+            pred  = -1
 
         if pred != predictions[i]:
             loss += 1
@@ -220,7 +225,12 @@ def benchmark_cnn(test_images, predictions, model, model_name, mode = "resources
         # stdout = "1234"
         # usage = 1
         stdout, _, usage = execute_and_monitor(command)
-        pred = int(stdout[-2])
+        
+        try:
+            pred = int(stdout[-2])
+        except ValueError:
+            print(f"Failed to convert {stdout[-2]} to int. Full output: {stdout}")
+            pred  = -1
 
         if pred != predictions[i]:
             loss += 1
@@ -451,7 +461,7 @@ def gen_model_dnn(layers, state_dict):
                 super(Net, self).__init__()
                 self.fc1 = nn.Linear(layers[0], layers[1])  # Flatten 
                 self.fc2 = nn.Linear(layers[1], layers[2])
-                self.fc3 = nn.Linear(layers[2], num_classes)  
+                self.fc3 = nn.Linear(layers[2], layers[3])  
 
             def forward(self, x):
                 x = F.relu(self.fc1(x))

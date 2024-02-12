@@ -219,7 +219,12 @@ def benchmark(test_images, predicted_labels, program,
                 _, stderr = process.communicate()
                 max_memory = future.result()
 
-        pred = int(stderr[-2])
+        try:
+            pred = int(stderr[-2])
+        except ValueError:
+            print(f"Failed to convert {stderr[-2]} to int. Full output: {stderr}")
+            pred  = -1
+
         if pred != predicted_labels[ind]:
             print ("Loss on index", ind, pred, predicted_labels[ind])
             loss += 1
