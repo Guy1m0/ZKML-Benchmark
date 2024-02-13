@@ -111,7 +111,7 @@ def cnn_datasets():
 
     return test_images_tf, test_images_tf_14
     
-def benchmark(test_images, predictions, model_name, model_in_path, circuit_folder, test = False, save = False):
+def benchmark(test_images, predictions, model_name, model_in_path, circuit_folder, test = False, save = False, notes = ""):
     # Convert the model
     tmp_folder = "./tmp/"
     msgpack_folder = tmp_folder + "msgpack/"
@@ -184,6 +184,7 @@ def benchmark(test_images, predictions, model_name, model_in_path, circuit_folde
         # Find max value and its index
         max_value = max(x_values)
         max_index = x_values.index(max_value)
+        print (max_index)
         
         if max_index != predictions[i]:
             loss += 1
@@ -210,7 +211,8 @@ def benchmark(test_images, predictions, model_name, model_in_path, circuit_folde
             'Avg Memory Usage (MB)': [sum(mem_usage) / len(mem_usage)],
             'Std Memory Usage': [pd.Series(mem_usage).std()],
             'Avg Proving Time (s)': [sum(time_cost) / len(time_cost)],
-            'Std Proving Time': [pd.Series(time_cost).std()]
+            'Std Proving Time': [pd.Series(time_cost).std()],
+            'Notes': notes
         }
         # arch = f'{arch_folder} ({"x".join(layers)})'
     else:
@@ -282,9 +284,11 @@ if __name__ == "__main__":
 
     parser.add_argument('--size', type=int, help='Test Size')
     parser.add_argument('--model', type=str, help='Model file path')
+    parser.add_argument('--agg', type=int, help='Set the start for aggregating benchmark results')
 
     parser.add_argument('--save', action='store_true', help='Flag to indicate if save results')
     parser.add_argument('--arm', action='store_true', help='Flag to indicate if use Arm64 Arch')
+
 
     args = parser.parse_args()
 
@@ -305,6 +309,12 @@ if __name__ == "__main__":
     if not args.save:
         args.save = False
 
+    start = 0
+    notes = ""
+    if args.agg:
+        start = args.agg
+        notes = f'start from {start}'
+
     if layers[0] > 30:
         dnn = True
     else:
@@ -315,7 +325,7 @@ if __name__ == "__main__":
     else:
         circuit_folder = "./x86_64/"
 
-    print (circuit_folder)
+
     if dnn:
         arch_folder = "input" + (len(layers)-1) * "-dense" + "/"
 
@@ -345,4 +355,4 @@ if __name__ == "__main__":
             _, tests = cnn_datasets()
         predicted_labels = get_predictions(interpreter, tests)
 
-    benchmark(tests[:args.size], predicted_labels[:args.size], args.model, model_in_path, circuit_folder, save=args.save)
+    benchmark(tests[start:start+args.size], predicted_labels[start:start+args.size], args.model, model_in_path, circuit_folder, save=args.save, notes = notes)

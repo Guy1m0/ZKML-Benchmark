@@ -1,4 +1,4 @@
-Framework,Architecture,# Layers,# Parameters,Testing Size,Accuracy Loss (%),Avg Memory Usage (MB),Std Memory Usage,Avg Proving Time (s),Std Proving Time, Notes
+Framework,Architecture,# Layers,# Parameters,Testing Size,Accuracy Loss (%),Avg Memory Usage (MB),Std Memory Usage,Avg Proving Time (s),Std Proving Time,Notes
 circomlib-ml (tensorflow),Input-Dense-Dense (196x25x10),3,5185,2500.0,0.0,998.735128125,8.040169563463648,1.1694816182136536,0.1084907231971162,non-linear constraints: 18075,
 circomlib-ml (tensorflow),Input-Dense-Dense (784x56x10),3,44543,2500.0,0.04,2328.3224109375,34.436486094939525,2.351284250640869,0.1471131820052062, non-linear constraints: 73416,
 zkml (tensorflow),Input-Dense-Dense (196x25x10),3,5185,1000.0,0.1,2334.29562890625,12.335300742362184,21.263429507017136,0.294183256688111,,
