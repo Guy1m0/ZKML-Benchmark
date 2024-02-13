@@ -565,7 +565,7 @@ def benchmark_cnn(test_images, predictions, layers, model_name, tmp_folder, inpu
     print ("Total time:", time.time() - benchmark_start_time)
     layers = model_name.split("_")
     arch = arch_folders[model_name][:-1]
-    arch = '-'.join(word.capitalize() for word in arch_folder.split('-')) + '_Kernal'
+    arch = '-'.join(word.capitalize() for word in arch.split('-')) + '_Kernal'
 
     layers[0] = str(int(layers[0])**2)
     new_row = {
