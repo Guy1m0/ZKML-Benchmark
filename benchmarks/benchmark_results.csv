@@ -1,4 +1,4 @@
-Framework,Architecture,# Layers,# Parameters,Testing Size,Accuracy Loss (%),Avg Memory Usage (MB),Std Memory Usage,Avg Proving Time (s),Std Proving Time,Notes,
+Framework,Architecture,# Layers,# Parameters,Testing Size,Accuracy Loss (%),Avg Memory Usage (MB),Std Memory Usage,Avg Proving Time (s),Std Proving Time,Notes,Unnamed: 11
 opml (pytorch),Input-Dense-Dense (196x25x10),3,5185,5000.0,3.52,74.3519484375,1.419724552917377,0.8094403253555298,0.0743565636656938,,
 opml (pytorch),Input-Dense-Dense (784x56x10),3,44543,2500.0,0.72,89.1208828125,2.254391994649578,3.6099741178512574,0.4217317863649381,,
 opml (pytorch),Input-Dense-Dense-Dense (196x24x14x10),4,5228,5000.0,3.42,74.4507890625,1.491529562213114,0.8297668685436249,0.0850841080593803,,
@@ -24,4 +24,4 @@ opml (pytorch),input-dense-dense-dense (196x24x14x10),4,5228,2500.0,3.56,70.3474
 ezkl (pytorch),Input-Conv2d-Conv2d-Dense_Kernal (784x6x16x10_5x5),5,5142,2500.0,0.08,49.866471875,0.2223909790040422,0.1562554306983948,0.0087186920090168,,
 ezkl (pytorch),Input-Conv2d-Conv2d-Dense-Dense_Kernal (196x5x11x80x10_3x3),6,4966,2500.0,0.0,50.039728125,0.2216638177277168,0.1505249107360839,0.005515878403739,,
 ezkl (pytorch),Input-Dense-Dense-Dense (196x24x14x10),4,5228,2500.0,17.68,91.00399375,0.7250067885538027,0.6858497230529785,0.0241002936863524,,
-ezkl (pytorch),Input-Dense-Dense (196x25x10),3,5185,2500.0,4.52,91.0270125,0.7484670755336666,0.6538142914772034,0.02639138374367524,,
+ezkl (pytorch),Input-Dense-Dense (196x25x10),3,5185,2500.0,4.52,91.0270125,0.7484670755336666,0.6538142914772034,0.0263913837436752,,

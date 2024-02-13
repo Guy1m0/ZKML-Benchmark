@@ -243,7 +243,7 @@ def benchmark_cnn(test_images, predictions, model, model_name, mode = "resources
 
     layers = model_name.split("_")
     arch = arch_folders[model_name][:-1]
-    arch = '-'.join(word.capitalize() for word in arch_folder.split('-')) + '_Kernal'
+    arch = '-'.join(word.capitalize() for word in arch.split('-')) + '_Kernal'
 
     layers[0] = str(int(layers[0])**2)
 

@@ -184,7 +184,7 @@ def benchmark(test_images, predictions, model_name, model_in_path, circuit_folde
         # Find max value and its index
         max_value = max(x_values)
         max_index = x_values.index(max_value)
-        print (max_index)
+        # print (max_index)
         
         if max_index != predictions[i]:
             loss += 1
@@ -198,7 +198,7 @@ def benchmark(test_images, predictions, model_name, model_in_path, circuit_folde
 
     if int(layers[0]) < 30:
         arch = arch_folders[model_name][:-1]
-        arch = '-'.join(word.capitalize() for word in arch_folder.split('-')) + '_Kernal'
+        arch = '-'.join(word.capitalize() for word in arch.split('-')) + '_Kernal'
         layers[0] = str(int(layers[0])**2)
 
         new_row = {
