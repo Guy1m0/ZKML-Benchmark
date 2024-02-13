@@ -188,7 +188,7 @@ def prepare(model, model_name, state_dict, test_images):
     return predicted_labels, fname_out
 
 def benchmark(test_images, predicted_labels, program, 
-              model_in_path, model_name, save = False):
+              model_in_path, arch, model_name, save = False):
     vm_file = "./opml/mlvm/mlvm"
     if not os.path.exists(vm_file):
         # File does not exist, print message and return from the function
@@ -246,7 +246,7 @@ def benchmark(test_images, predicted_labels, program,
     layers = model_name.split("_")
     new_row = {
         'Framework': ['opml (pytorch)'],
-        'Architecture': [f'Input-Dense-Dense ({"x".join(layers)})'],
+        'Architecture': [f'{arch} ({"x".join(layers)})'],
         '# Layers': [len(layers)],
         '# Parameters': [params[model_name]],
         'Testing Size': [len(mem_usage)],
@@ -353,4 +353,4 @@ if __name__ == "__main__":
 
     #, args.size, test_images_pt, test_labels_pt, args.model, args.save
     
-    benchmark(tests, predicted_labels, program, model_in_path, args.model, args.save)
+    benchmark(tests, predicted_labels, program, model_in_path, arch_folder[:-1], args.model, args.save)

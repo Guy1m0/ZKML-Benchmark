@@ -401,7 +401,7 @@ def load_csv():
     df = pd.read_csv(csv_path)
     return df
 
-def benchmark(test_images, predictions, weights, biases, layers, model_name, tmp_folder, input_path, zkey, veri_key, verify = False, save=False):
+def benchmark_dnn(test_images, predictions, weights, biases, layers, model_name, tmp_folder, input_path, zkey, veri_key, verify = False, save=False):
     loss = 0
 
     target_circom = "_".join(str(x) for x in layers) + '.circom'
@@ -485,9 +485,10 @@ def benchmark(test_images, predictions, weights, biases, layers, model_name, tmp
     print ("Total time:", time.time() - benchmark_start_time)
 
     layers = model_name.split("_")
+    arch = "Input" + (len(layers)-1) * "-Dense"
     new_row = {
         'Framework': ['circomlib-ml (tensorflow)'],
-        'Architecture': [f'{arch_folder} ({"x".join(layers)})'],
+        'Architecture': [f'{arch} ({"x".join(layers)})'],
         '# Layers': [len(layers)],
         '# Parameters': [params[model_name]],
         'Testing Size': [len(mem_usage)],
@@ -563,13 +564,13 @@ def benchmark_cnn(test_images, predictions, layers, model_name, tmp_folder, inpu
 
     print ("Total time:", time.time() - benchmark_start_time)
     layers = model_name.split("_")
-    arch_folder = arch_folders[model_name]
+    arch = arch_folders[model_name][:-1]
+    arch = '-'.join(word.capitalize() for word in arch_folder.split('-')) + '_Kernal'
 
-    layers = layers[:-1]
     layers[0] = str(int(layers[0])**2)
     new_row = {
         'Framework': ['circomlib-ml (tensorflow)'],
-        'Architecture': [f'{arch_folder} ({"x".join(layers)})'],
+        'Architecture': [f'{arch} ({"x".join(layers[:-1])}_{layers[-1]}x{layers[-1]})'],
         '# Layers': [len(layers)],
         '# Parameters': [params[model_name]],
         'Testing Size': [len(mem_usage)],
@@ -716,7 +717,7 @@ if __name__ == "__main__":
         predicted_labels, tests = prepare(model, layers)
         weights, biases = transfer_weights(layers, model, 36)
 
-        benchmark(tests[:args.size], predicted_labels[:args.size], weights, biases,
+        benchmark_dnn(tests[:args.size], predicted_labels[:args.size], weights, biases,
                   layers, args.model, output_folder, output_folder+"input.json", zkey_1, veri_key, verify=args.debug, save=args.save)
        
     else:

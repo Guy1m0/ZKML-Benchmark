@@ -193,31 +193,42 @@ def benchmark(test_images, predictions, model_name, model_in_path, circuit_folde
         time_cost.append(time.time() - start_time)
 
     print ("Total time:", time.time() - benchmark_start_time)
+    layers = model_name.split("_")
 
-    if int(model_name.split("_")[0]) < 30:
-        layers = model_name.split("_")
-        arch_folder = arch_folders[model_name]
-
-        layers = layers[:-1]
+    if int(layers[0]) < 30:
+        arch = arch_folders[model_name][:-1]
+        arch = '-'.join(word.capitalize() for word in arch_folder.split('-')) + '_Kernal'
         layers[0] = str(int(layers[0])**2)
 
-        arch = f'{arch_folder} ({"x".join(layers)})'
+        new_row = {
+            'Framework': ['zkml (tensorflow)'],
+            'Architecture': [f'{arch} ({"x".join(layers[:-1])}_{layers[-1]}x{layers[-1]})'],
+            '# Layers': [len(layers)],
+            '# Parameters': [params[model_name]],
+            'Testing Size': [len(mem_usage)],
+            'Accuracy Loss (%)': [loss/len(mem_usage) * 100],
+            'Avg Memory Usage (MB)': [sum(mem_usage) / len(mem_usage)],
+            'Std Memory Usage': [pd.Series(mem_usage).std()],
+            'Avg Proving Time (s)': [sum(time_cost) / len(time_cost)],
+            'Std Proving Time': [pd.Series(time_cost).std()]
+        }
+        # arch = f'{arch_folder} ({"x".join(layers)})'
     else:
         layers = model_name.split("_")
-        arch = "input" + (len(layers)-1) * "-dense"
+        arch = "Input" + (len(layers)-1) * "-Dense"
 
-    new_row = {
-        'Framework': ['zkml (tensorflow)'],
-        'Architecture': [arch],
-        '# Layers': [len(layers)],
-        '# Parameters': [params[model_name]],
-        'Testing Size': [len(mem_usage)],
-        'Accuracy Loss (%)': [loss/len(mem_usage) * 100],
-        'Avg Memory Usage (MB)': [sum(mem_usage) / len(mem_usage)],
-        'Std Memory Usage': [pd.Series(mem_usage).std()],
-        'Avg Proving Time (s)': [sum(time_cost) / len(time_cost)],
-        'Std Proving Time': [pd.Series(time_cost).std()]
-    }
+        new_row = {
+            'Framework': ['zkml (tensorflow)'],
+            'Architecture': [f'{arch} ({"x".join(layers)})'],
+            '# Layers': [len(layers)],
+            '# Parameters': [params[model_name]],
+            'Testing Size': [len(mem_usage)],
+            'Accuracy Loss (%)': [loss/len(mem_usage) * 100],
+            'Avg Memory Usage (MB)': [sum(mem_usage) / len(mem_usage)],
+            'Std Memory Usage': [pd.Series(mem_usage).std()],
+            'Avg Proving Time (s)': [sum(time_cost) / len(time_cost)],
+            'Std Proving Time': [pd.Series(time_cost).std()]
+        }
 
     new_row_df = pd.DataFrame(new_row)
     print (new_row_df)

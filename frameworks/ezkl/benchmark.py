@@ -173,9 +173,10 @@ def benchmark_dnn(test_images, predictions, model, model_name, mode = "resources
     print ("Total time:", time.time() - benchmark_start_time)
 
     layers = model_name.split("_")
+    arch = "Input" + (len(layers)-1) * "-Dense"
     new_row = {
         'Framework': ['ezkl (pytorch)'],
-        'Architecture': [f'Input-Dense-Dense ({"x".join(layers)})'],
+        'Architecture': [f'{arch} ({"x".join(layers)})'],
         '# Layers': [len(layers)],
         '# Parameters': [params[model_name]],
         'Testing Size': [len(mem_usage)],
@@ -241,14 +242,14 @@ def benchmark_cnn(test_images, predictions, model, model_name, mode = "resources
     print ("Total time:", time.time() - benchmark_start_time)
 
     layers = model_name.split("_")
-    arch_folder = arch_folders[model_name]
+    arch = arch_folders[model_name][:-1]
+    arch = '-'.join(word.capitalize() for word in arch_folder.split('-')) + '_Kernal'
 
-    layers = layers[:-1]
     layers[0] = str(int(layers[0])**2)
 
     new_row = {
-        'Framework': ['zkml (pytorch)'],
-        'Architecture': [f'{arch_folder} ({"x".join(layers)})'],
+        'Framework': ['ezkl (pytorch)'],
+        'Architecture': [f'{arch} ({"x".join(layers[:-1])}_{layers[-1]}x{layers[-1]})'],
         '# Layers': [len(layers)],
         '# Parameters': [params[model_name]],
         'Testing Size': [len(mem_usage)],
