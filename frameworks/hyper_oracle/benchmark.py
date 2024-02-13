@@ -189,7 +189,15 @@ def prepare(model, model_name, state_dict, test_images):
 
 def benchmark(test_images, predicted_labels, program, 
               model_in_path, model_name, save = False):
-    vm_file = "./bin/vm"
+    vm_file = "./opml/mlvm/mlvm"
+    if not os.path.exists(vm_file):
+        # File does not exist, print message and return from the function
+        print("Need to run the setup, by calling bash code 'bash ./setup-opml.sh'")
+        return
+    
+    # If the file exists, proceed with the rest of the function
+    print("File exists, proceeding with the operation.")
+
     #program = "./bin/mlgo_196_IDD.bin"
     tmp_folder = './tmp/'
 
@@ -208,16 +216,17 @@ def benchmark(test_images, predicted_labels, program,
                 f"--data={img_out_path}", "--mipsVMCompatible"]
         
         print ("Process for image", ind)
+        # subprocess.run(command)
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
         # Get the process ID
         pid = process.pid
+        # print ("pid:", pid)
 
-        if True:
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                future = executor.submit(monitor_memory, pid)
-                _, stderr = process.communicate()
-                max_memory = future.result()
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(monitor_memory, pid)
+            _, stderr = process.communicate()
+            max_memory = future.result()
 
         try:
             pred = int(stderr[-2])
