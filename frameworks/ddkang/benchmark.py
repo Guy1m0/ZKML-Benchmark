@@ -111,7 +111,7 @@ def cnn_datasets():
 
     return test_images_tf, test_images_tf_14
     
-def benchmark(test_images, predictions, model_name, model_in_path, test=False, save = False):
+def benchmark(test_images, predictions, model_name, model_in_path, circuit_folder, test = False, save = False):
     # Convert the model
     tmp_folder = "./tmp/"
     msgpack_folder = tmp_folder + "msgpack/"
@@ -168,9 +168,9 @@ def benchmark(test_images, predictions, model_name, model_in_path, test=False, s
 
         command_1 = ["python", f"{input_convert_path}", "--model_config", f"{config_out_path}",
                 "--inputs", img_in_path, "--output", img_out_path]
-
+        # print (command_1)
         command_2 = [call_path, model_out_path, img_out_path, "kzg"]
-        
+        # print (command_2)
         _, _, usage = execute_and_monitor(command_1)
         cost += usage
         stdout, _, usage = execute_and_monitor(command_2)
