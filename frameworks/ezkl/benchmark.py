@@ -174,7 +174,7 @@ def benchmark_dnn(test_images, predictions, model, model_name, mode = "resources
 
     layers = model_name.split("_")
     new_row = {
-        'Framework': ['opml (pytorch)'],
+        'Framework': ['ezkl (pytorch)'],
         'Architecture': [f'Input-Dense-Dense ({"x".join(layers)})'],
         '# Layers': [len(layers)],
         '# Parameters': [params[model_name]],
