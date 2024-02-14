@@ -1,4 +1,4 @@
-Framework,Architecture,# Layers,# Parameters,Testing Size,Accuracy Loss (%),Avg Memory Usage (MB),Std Memory Usage,Avg Proving Time (s),Std Proving Time,Notes,Unnamed: 11
+Framework,Architecture,# Layers,# Parameters,Testing Size,Accuracy Loss (%),Avg Memory Usage (MB),Std Memory Usage,Avg Proving Time (s),Std Proving Time,Notes
 opml (pytorch),Input-Dense-Dense (196x25x10),3,5185,5000.0,3.52,74.3519484375,1.419724552917377,0.8094403253555298,0.0743565636656938,,
 opml (pytorch),Input-Dense-Dense (784x56x10),3,44543,2500.0,0.72,89.1208828125,2.254391994649578,3.6099741178512574,0.4217317863649381,,
 opml (pytorch),Input-Dense-Dense-Dense (196x24x14x10),4,5228,5000.0,3.42,74.4507890625,1.491529562213114,0.8297668685436249,0.0850841080593803,,

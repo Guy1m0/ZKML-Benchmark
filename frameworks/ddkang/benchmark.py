@@ -229,7 +229,8 @@ def benchmark(test_images, predictions, model_name, model_in_path, circuit_folde
             'Avg Memory Usage (MB)': [sum(mem_usage) / len(mem_usage)],
             'Std Memory Usage': [pd.Series(mem_usage).std()],
             'Avg Proving Time (s)': [sum(time_cost) / len(time_cost)],
-            'Std Proving Time': [pd.Series(time_cost).std()]
+            'Std Proving Time': [pd.Series(time_cost).std()],
+            'Notes': notes
         }
 
     new_row_df = pd.DataFrame(new_row)
