@@ -122,7 +122,7 @@ def execute_and_monitor(command, show = False):
         print("Total time:", time.time() - start_time)
     return stdout, stderr, max_memory
 
-def benchmark_dnn(test_images, predictions, model, model_name, mode = "resources", output_folder='./tmp/', save = False):
+def benchmark_dnn(test_images, predictions, model, model_name, mode = "resources", output_folder='./tmp/', save = False, notes = ""):
     data_path = os.path.join(output_folder, 'input.json')
     model_path = os.path.join(output_folder, 'network.onnx')
 
@@ -163,7 +163,7 @@ def benchmark_dnn(test_images, predictions, model, model_name, mode = "resources
         except ValueError:
             print(f"Failed to convert {stdout[-2]} to int. Full output: {stdout}")
             pred  = -1
-
+        #print ('pred:',pred)
         if pred != predictions[i]:
             loss += 1
             print ("Loss happens on index", i, "predicted_class", pred)
@@ -184,9 +184,12 @@ def benchmark_dnn(test_images, predictions, model, model_name, mode = "resources
         'Avg Memory Usage (MB)': [sum(mem_usage) / len(mem_usage)],
         'Std Memory Usage': [pd.Series(mem_usage).std()],
         'Avg Proving Time (s)': [sum(time_cost) / len(time_cost)],
-        'Std Proving Time': [pd.Series(time_cost).std()]
+        'Std Proving Time': [pd.Series(time_cost).std()],
+        'Notes': [f'mode={mode}']
     }
 
+    if notes:
+        new_row['Notes'] = [new_row['Notes'][0] + " | " + notes]
     new_row_df = pd.DataFrame(new_row)
     print (new_row_df)
 
@@ -502,6 +505,7 @@ if __name__ == "__main__":
     show_group.add_argument('--list', action='store_true', help='Show list of supported models and exit')
 
     parser.add_argument('--save', action='store_true', help='Flag to indicate if save results')
+    parser.add_argument('--agg', type=int, help='Set the start for aggregating benchmark results')
 
     parser.add_argument('--accuracy', action='store_true', help='Flag to indicate if use accuracy mode which may sacrifice efficiency')
 
@@ -520,6 +524,12 @@ if __name__ == "__main__":
 
     layers = [int(x) for x in args.model.split("_")]
     model_path = "../../models/"
+
+    start = 0
+    notes = ""
+    if args.agg:
+        start = args.agg
+        notes = f'start from {start}'
 
     if layers[0] > 30:
         dnn = True
@@ -544,8 +554,8 @@ if __name__ == "__main__":
             mode = "resources"
 
         predicted_labels, tests = prepare(model, layers)
-        benchmark_dnn(tests[:args.size], predicted_labels[:args.size], model, args.model, 
-                    mode=mode, save=args.save)
+        benchmark_dnn(tests[start:start+args.size], predicted_labels[start:start+args.size], model, args.model, 
+                    mode=mode, save=args.save, notes=notes)
     else:
         arch_folder = arch_folders[args.model]
         
