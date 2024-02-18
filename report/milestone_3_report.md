@@ -73,17 +73,193 @@ The benchmarking process for evaluating zkML frameworks is designed to offer a t
 
 Through this detailed benchmarking process, we aim to provide a nuanced understanding of each zkML framework’s capabilities, especially in handling increasingly complex machine learning models. This approach will guide users in selecting the most suitable framework for their specific requirements in the realm of zkML.
 
-
-
 # Results
-
-1. overall results (proving time and memory usage) among each frameworks on same MLP
-2. Sum of accuracy loss for each MLP, mark by different color
-3. Discussion of sacle factor
+Before discussing the benchmark results, I will first list all the tested models (aka neural network) as follows:
 
 ## DNN
-
+### 784_56_10
+```
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_1 (InputLayer)        [(None, 784)]             0         
+                                                                 
+ dense (Dense)               (None, 56)                43960     
+                                                                  
+ dense_1 (Dense)             (None, 10)                570       
+                                                                 
+=================================================================
+Total params: 44530 (173.95 KB)
+Trainable params: 44530 (173.95 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+```
+### 196_25_10
+```
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_1 (InputLayer)        [(None, 196)]             0         
+                                                                 
+ dense (Dense)               (None, 25)                4925      
+                                                                 
+ dense_1 (Dense)             (None, 10)                260       
+                                                                 
+=================================================================
+Total params: 5185 (20.25 KB)
+Trainable params: 5185 (20.25 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+```
+### 196_24_14_10
+```
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_1 (InputLayer)        [(None, 196)]             0         
+                                                                 
+ dense (Dense)               (None, 24)                4728      
+                                                                 
+ dense_1 (Dense)             (None, 14)                350       
+                                                                 
+ dense_2 (Dense)             (None, 10)                150       
+                                                                 
+=================================================================
+Total params: 5228 (20.42 KB)
+Trainable params: 5228 (20.42 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+```
 
 ## CNN
+### 28_6_16_10_5
+```
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_1 (InputLayer)       [(None, 28, 28, 1)]       0         
+                                                                 
+ conv2d (Conv2D)            (None, 24, 24, 6)         156       
+                                                                 
+ re_lu (ReLU)               (None, 24, 24, 6)         0         
+                                                                 
+ average_pooling2d (Aver    (None, 12, 12, 6)         0         
+ agePooling2D)                                                   
+                                                                 
+ conv2d_1 (Conv2D)          (None, 8, 8, 16)          2416      
+                                                                 
+ re_lu_1 (ReLU)             (None, 8, 8, 16)          0         
+                                                                 
+ average_pooling2d_1 (Aver  (None, 4, 4, 16)          0         
+ agePooling2D)                                                   
+                                                                 
+ flatten (Flatten)          (None, 256)               0         
+                                                                 
+ dense (Dense)              (None, 10)                2570      
+                                                                 
+=================================================================
+Total params: 5142 (20.09 KB)
+Trainable params: 5142 (20.09 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+```
+### 14_5_11_80_10_3
+```
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_4 (InputLayer)        [(None, 14, 14, 1)]       0         
+                                                                 
+ conv2d_10 (Conv2D)          (None, 12, 12, 5)         50        
+                                                                 
+ re_lu_6 (ReLU)              (None, 12, 12, 5)         0         
+                                                                 
+ average_pooling2d_10 (Aver  (None, 6, 6, 5)           0         
+ agePooling2D)                                                   
+                                                                 
+ conv2d_11 (Conv2D)          (None, 4, 4, 11)          506       
+                                                                 
+ re_lu_7 (ReLU)              (None, 4, 4, 11)          0         
+                                                                 
+ average_pooling2d_11 (Aver  (None, 2, 2, 11)          0         
+ agePooling2D)                                                   
+                                                                 
+ flatten_5 (Flatten)         (None, 44)                0         
+                                                                 
+ dense_15 (Dense)            (None, 80)                3600      
+                                                                 
+ re_lu_8 (ReLU)              (None, 80)                0         
+                                                                 
+ dense_16 (Dense)            (None, 10)                810       
+                                                                 
+=================================================================
+Total params: 4966 (19.40 KB)
+Trainable params: 4966 (19.40 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+```
+### 28_6_16_120_84_10_5
+
+```
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_1 (InputLayer)        [(None, 28, 28, 1)]       0         
+                                                                 
+ conv2d (Conv2D)             (None, 24, 24, 6)         156       
+                                                                 
+ re_lu (ReLU)                (None, 24, 24, 6)         0         
+                                                                 
+ average_pooling2d (Average  (None, 12, 12, 6)         0         
+ Pooling2D)                                                      
+                                                                 
+ conv2d_1 (Conv2D)           (None, 8, 8, 16)          2416      
+                                                                 
+ re_lu_1 (ReLU)              (None, 8, 8, 16)          0         
+                                                                 
+ average_pooling2d_1 (Avera  (None, 4, 4, 16)          0         
+ gePooling2D)                                                    
+                                                                 
+ flatten (Flatten)           (None, 256)               0         
+                                                                 
+ dense (Dense)               (None, 120)               30840     
+                                                                 
+ re_lu_2 (ReLU)              (None, 120)               0         
+                                                                 
+ dense_1 (Dense)             (None, 84)                10164     
+                                                                 
+ re_lu_3 (ReLU)              (None, 84)                0         
+                                                                 
+ dense_2 (Dense)             (None, 10)                850       
+                                                                 
+=================================================================
+Total params: 44426 (173.54 KB)
+Trainable params: 44426 (173.54 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+```
+
+> For some unknown reasons, using 'accuracy' mode for ezkl to benchmark on model '196_24_14_10' will crash the testing system since it requires more 128 GB memory. Therefore, we omit this testing set in our benchmark and will add this later when this bug has been fixed.
+
+## Increasing Layer
+![]
+
+## Increasing Parameter
+
+
+## Changing Layer
+
 
 # Analysis
+
+## zkML Delemma
+
+## Layer VS Activition Func
+
+## Sacling Factor
