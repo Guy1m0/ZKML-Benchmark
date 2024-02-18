@@ -264,9 +264,9 @@ def prepare_input_json_cnn(X, layers, input_path, scalar = 18):
 
     out = [int(x) for x in dense_out]
 
-    if len(layers) == 6:
-        dense_1_weights = [[int(model.layers[10].weights[0][i][j]*(10**scalar)) for j in range(10)] for i in range(layers[3])]
-        dense_1_bias = [int(model.layers[10].weights[1][i]*(10**(scalar * 2))) for i in range(10)]
+    if len(layers) >= 6:
+        dense_1_weights = [[int(model.layers[10].weights[0][i][j]*(10**scalar)) for j in range(layers[4])] for i in range(layers[3])]
+        dense_1_bias = [int(model.layers[10].weights[1][i]*(10**(scalar * 2))) for i in range(layers[4])]
 
         re_lu_3_out = [dense_out[i] if int(dense_out[i]) < p//2 else 0 for i in range(layers[3])]
         dense_1_in = [int(re_lu_3_out[i]) for i in range(layers[3])]
@@ -285,6 +285,30 @@ def prepare_input_json_cnn(X, layers, input_path, scalar = 18):
         # Append new entries to in_json
         in_json.update(new_entries)
         out = [int(x) for x in dense_1_out]
+
+    if len(layers) >= 7:
+        #print (layers[5], layers[4])
+        #print ('model:', model.layers[12].weights)
+        dense_2_weights = [[int(model.layers[12].weights[0][i][j]*(10**scalar)) for j in range(layers[5])] for i in range(layers[4])]
+        dense_2_bias = [int(model.layers[12].weights[1][i]*(10**(scalar * 2))) for i in range(layers[5])]
+
+        re_lu_4_out = [dense_1_out[i] if int(dense_1_out[i]) < p//2 else 0 for i in range(layers[4])]
+        dense_2_in = [int(re_lu_4_out[i]) for i in range(layers[4])]
+
+        _, dense_2_weights, dense_2_bias, dense_2_out, dense_2_remainder = DenseInt_(layers[4], layers[5], 10**scalar, dense_2_in, dense_2_weights, dense_2_bias)
+
+        #dense_1_out = [str(x) for x in dense_1_out]
+
+        new_entries = {
+            "dense_1_re_lu_out":re_lu_4_out,
+            "dense_2_weights":dense_2_weights,
+            "dense_2_bias":dense_2_bias,
+            "dense_2_out":dense_2_out,
+            "dense_2_remainder":dense_2_remainder
+        }
+        # Append new entries to in_json
+        in_json.update(new_entries)
+        out = [int(x) for x in dense_2_out]
 
     out = [x if x < p//2 else 0 for x in out]
     pred = np.argmax(out)
@@ -369,9 +393,13 @@ def gen_model_cnn(layers, model_in_path):
     out = tf.keras.layers.Flatten()(out)
     out = tf.keras.layers.Dense(layers[3])(out)
 
-    if len(layers) == 6:
+    if len(layers) >= 6:
         out = tf.keras.layers.ReLU()(out)
         out = tf.keras.layers.Dense(layers[4])(out)
+
+    if len(layers) >= 7:
+        out = tf.keras.layers.ReLU()(out)
+        out = tf.keras.layers.Dense(layers[5])(out)
 
     model = tf.keras.Model(inputs, out)
 
@@ -571,7 +599,7 @@ def benchmark_cnn(test_images, predictions, layers, model_name, tmp_folder, inpu
     new_row = {
         'Framework': ['circomlib-ml (tensorflow)'],
         'Architecture': [f'{arch} ({"x".join(layers[:-1])}_{layers[-1]}x{layers[-1]})'],
-        '# Layers': [len(layers)],
+        '# Layers': [len(layers)-1],
         '# Parameters': [params[model_name]],
         'Testing Size': [len(mem_usage)],
         'Accuracy Loss (%)': [loss/len(mem_usage) * 100],

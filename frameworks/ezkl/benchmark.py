@@ -253,7 +253,7 @@ def benchmark_cnn(test_images, predictions, model, model_name, mode = "resources
     new_row = {
         'Framework': ['ezkl (pytorch)'],
         'Architecture': [f'{arch} ({"x".join(layers[:-1])}_{layers[-1]}x{layers[-1]})'],
-        '# Layers': [len(layers)],
+        '# Layers': [len(layers)-1],
         '# Parameters': [params[model_name]],
         'Testing Size': [len(mem_usage)],
         'Accuracy Loss (%)': [loss/len(mem_usage) * 100],

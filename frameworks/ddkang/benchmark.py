@@ -204,7 +204,7 @@ def benchmark(test_images, predictions, model_name, model_in_path, circuit_folde
         new_row = {
             'Framework': ['zkml (tensorflow)'],
             'Architecture': [f'{arch} ({"x".join(layers[:-1])}_{layers[-1]}x{layers[-1]})'],
-            '# Layers': [len(layers)],
+            '# Layers': [len(layers)-1],
             '# Parameters': [params[model_name]],
             'Testing Size': [len(mem_usage)],
             'Accuracy Loss (%)': [loss/len(mem_usage) * 100],
