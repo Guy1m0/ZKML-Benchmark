@@ -1,0 +1,7 @@
+Framework,Architecture,# Layers,# Parameters,Testing Size,Accuracy Loss (%),Avg Memory Usage (MB),Std Memory Usage,Avg Proving Time (s),Std Proving Time,Notes
+circomlib-ml (tensorflow),Input-Conv2d-Conv2d-Dense-Dense-Dense_Kernal (784x6x16x120x84x10_5x5),6,44426,2500,0.0,19229.712890625,134.04421109364836,63.801468091011046,6.655692868040273,non-linear constraints: 22703268
+circomlib-ml (tensorflow),Input-Dense-Dense (784x56x10),3,44543,2500,0.04,2328.3224109375,34.436486094939525,2.351284250640869,0.1471131820052062,non-linear constraints: 73416
+ezkl (pytorch),Input-Conv2d-Conv2d-Dense-Dense-Dense_Kernal (784x6x16x120x84x10_5x5),6,44530,2500,0.0,49.956265625,0.2028453983244115,0.2025856124877929,0.0078245883136257,mode=resource
+ezkl (pytorch),Input-Dense-Dense (784x56x10),3,44543,2500,0.0,4807.18358828125,1719.0850921556596,38.01049669950803,14.2439372127979,mode=accuracy | Combined 0-2500
+zkml (tensorflow),Input-Conv2d-Conv2d-Dense-Dense-Dense_Kernal (784x6x16x120x84x10_5x5),6,44530,2500,0.04,1764.90855625,6.118766943245166,15.05950158071518,0.2576205806949553,
+zkml (tensorflow),Input-Dense-Dense (784x56x10),3,44543,2500,0.0,2355.045955208333,11.750075689547986,21.730601939582826,0.3170963857982319,Combined 0-2500
