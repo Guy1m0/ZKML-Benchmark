@@ -4,35 +4,30 @@ ZKML Benchmarking
 
 # Introduction
 
-As machine learning continues to expand in the global market, the reliability and integrity of its models have become paramount. Considering the case of Machine Learning as a Service (MLaaS), there's an inherent need to guarantee that the offered model truly matches its description (also noted as **model authenticity**), while operating within accurate parameters and maintaining a degree of privacy. Zero-knowledge proof, more specifically zero-knowledge Machine Learning (zkML), steps in to bridge this trust gap, vouching for both the integrity of computations and the confidentiality of underlying weights and structures.
+As machine learning continues its expansion in the global market, the reliability and integrity of its models have become paramount. This is especially true in the context of Machine Learning as a Service (MLaaS), where there's an inherent need to ensure **model authenticity**, which means guaranteeing that the offered model not only matches its description but also operates within accurate parameters while maintaining a degree of privacy. To achieve this, zk-SNARK (Zero-Knowledge Succinct Non-Interactive Argument of Knowledge) has garnered significant attention. Its ability to produce short proofs, regardless of the size of the input data, makes it a prime candidate for integration with ML frameworks like EZKL and Daniel Kang's zkml. However, the challenge of translating ML models into circuits optimized for zero-knowledge-proof systems is non-trivial, particularly for complex neural networks.
 
-To achieve this, zk-SNARK (Zero-Knowledge Succinct Non-Interactive Argument of Knowledge) has garnered significant attention. Its ability to produce short proofs, regardless of the size of the input data, makes it a prime candidate for integration with ML frameworks like EZKL and Daniel Kang's zkml. However, translating ML models into circuits optimized for these zero-knowledge-proof systems remains a challenge, even when the models aren't intricate neural networks. 
+Consequently, progress has been made in crafting custom circuits using existing architectures, like zk-STARK, Halo2, and Plonk2. Although these custom circuits can accommodate the sophisticated operations of modern ML models, they often fall short of being scalable, generalized solutions. This situation presents developers with a dilemma: selecting the framework that best suits their specific needs.
 
-Consequently, progress has been made in crafting custom circuits using existing architectures, like zk-STARK, Halo2, and Plonk2. While these custom circuits can support the complex operations intrinsic to modern ML models, they often stray from being scalable generalized solutions. Naturally, this landscape presents developers with a quandary: which framework aligns best with their specific requirements?
-
-Addressing this challenge, I'm developing a zkML benchmark. This tool aids developers in discerning the trade-offs and performance nuances among various frameworks. While manually setting up and conducting benchmarks for the increasing number of frameworks can be daunting, and though these frameworks often come with their benchmark sets, direct comparisons become intricate due to the myriad of performance-impacting variables. My approach has been to establish uniform conditions across all frameworks, aiming to offer a pragmatic and straightforward comparison among them.
-
-It's worth noting that machine learning models generally undergo two phases: the **training phase** and the **inference phase**. Due to the computational complexity associated with verifying training in-circuit, this benchmark primarily focuses on frameworks designed for the inference stage of ML models. 
-
+To address this issue, I'm developing a zkML benchmark. This tool is designed to assist developers in understanding the trade-offs and performance differences among various frameworks. While many frameworks offer their own benchmark sets, making direct comparisons is complex due to the numerous variables that affect performance. My approach focuses on establishing uniform conditions across all frameworks to provide a practical and straightforward comparison.
 
 
 # How to Benchmark
+The demo video has been uploaded to youtube: https://www.youtube.com/watch?v=spH1DYuvEmk
 
-For each frameworks please first check all the supported model by running:
+In general, please first check all the supported model by running for each frameworks:
 ```
 python benchmark.py --list
 ```
 
-and then run the benchmark:
+and then run the benchmark given the output from previous command:
 ```
 python benchmark.py --model <model name> --size <test size>
 ```
 
-To show all the commands
+It is worth noting that the argments needed for each frameworks may vary. Therefore, user may chack all the commands as follows:
+
 ```
 python benchmark.py -h
 ```
 
-Please note that the argments needed for each frameworks may vary. 
-
-> For framework proposed by socathie, need to do the 'setupt-circom.sh' and then run the script 'trusted_setup.py'. Better not reuse trusted-setup env for other model, if and only if the original is big enought. Or will return "[ERROR] snarkJS: Error: Invalid witness length."
+> For frameworks proposed by hyper_oracle and  so_cathie, please first run the setup bash code

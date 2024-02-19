@@ -201,7 +201,7 @@ def benchmark_dnn(test_images, predictions, model, model_name, mode = "resources
 
     return
 
-def benchmark_cnn(test_images, predictions, model, model_name, mode = "resources", output_folder='./tmp/', save=False):
+def benchmark_cnn(test_images, predictions, model, model_name, mode = "resources", output_folder='./tmp/', save=False, notes=""):
     data_path = os.path.join(output_folder, 'input.json')
     model_path = os.path.join(output_folder, 'network.onnx')
 
@@ -260,7 +260,8 @@ def benchmark_cnn(test_images, predictions, model, model_name, mode = "resources
         'Avg Memory Usage (MB)': [sum(mem_usage) / len(mem_usage)],
         'Std Memory Usage': [pd.Series(mem_usage).std()],
         'Avg Proving Time (s)': [sum(time_cost) / len(time_cost)],
-        'Std Proving Time': [pd.Series(time_cost).std()]
+        'Std Proving Time': [pd.Series(time_cost).std()],
+        'Notes': notes
     }
 
     new_row_df = pd.DataFrame(new_row)
@@ -526,16 +527,23 @@ if __name__ == "__main__":
     model_path = "../../models/"
 
     start = 0
-    notes = ""
-    if args.agg:
-        start = args.agg
-        notes = f'start from {start}'
 
     if layers[0] > 30:
         dnn = True
     else:
         dnn = False
-        
+
+    if args.accuracy and dnn:
+        mode = "accuracy"
+    else:
+        mode = "resources"
+
+    notes = f'mode={mode}'
+
+    if args.agg:
+        start = args.agg
+        notes += f' | start from {start}'
+
     if dnn:
         arch_folder = "input" + (len(layers)-1) * "-dense" + "/"
 
@@ -547,11 +555,6 @@ if __name__ == "__main__":
         os.makedirs(output_folder, exist_ok=True)
 
         model = gen_model_dnn(layers, state_dict)
-
-        if args.accuracy:
-            mode = "accuracy"
-        else:
-            mode = "resources"
 
         predicted_labels, tests = prepare(model, layers)
         benchmark_dnn(tests[start:start+args.size], predicted_labels[start:start+args.size], model, args.model, 
@@ -566,9 +569,4 @@ if __name__ == "__main__":
         predicted_labels, tests = prepare_cnn(model, layers)
 
         benchmark_cnn(tests[:args.size], predicted_labels[:args.size], model, args.model, 
-                save=args.save)
-
-
-    #, args.size, test_images_pt, test_labels_pt, args.model, args.save
-    
-    #benchmark(tests, predicted_labels, program, model_in_path, args.model, args.save)
+                save=args.save, notes=notes)

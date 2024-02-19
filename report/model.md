@@ -50,8 +50,6 @@ supported_ops = [
 ]
 
 
-* ReLU not support as activition for Dense
-
 ### DDKang (TF)
 
 1. Conv2D
@@ -75,11 +73,3 @@ orion: tensorflow -> tflite (tensorflow_model_optimization)
 ddkang: tensoflow -> tflite
 ezkl: pytorch -> pth
 
-# Model Design
-
-Start from DNN to include Orion and OPML, then move to CNN for testing ezkl, k2c and ddk
-
-Also discuss the scaling solution, compare them based on the accuracy loss results
-
-* Accuracy Loss: based on the scaling solution
-* 
