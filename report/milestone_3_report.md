@@ -74,10 +74,14 @@ The benchmarking process for evaluating zkML frameworks is designed to offer a t
 Through this detailed benchmarking process, we aim to provide a nuanced understanding of each zkML framework’s capabilities, especially in handling increasingly complex machine learning models. This approach will guide users in selecting the most suitable framework for their specific requirements in the realm of zkML.
 
 # Results
-Before discussing the benchmark results, I will first list all the tested models (aka neural network) as follows:
+Before delving into the benchmark results, let's enumerate the tested models.
 
 ## DNN
-### 784_56_10
+The initial testing network is comprised of Deep Neural Networks (DNN), each featuring an input layer followed by two or three fully connected dense layers. The nomenclature for each model is derived from the size of its layers, separated by underscores ('_'). For instance, the model named "784_56_10" signifies an input size of 784 (corresponding to MNIST dataset images, which are 28x28 pixels grayscale images), a subsequent dense layer with 56 units, and finally, an output layer designed to infer 10 distinct classes. Models "196_25_10" and "196_24_14_10" have their input size reduced from 28x28 to 14x14 pixels to evaluate the performance of the selected frameworks on DNNs with varying layers and parameters. Below are the specifics of each network outlined in the subsequent subsections.
+
+### Specification
+
+* 784_56_10
 ```
 Model: "model"
 _________________________________________________________________
@@ -95,7 +99,10 @@ Trainable params: 44530 (173.95 KB)
 Non-trainable params: 0 (0.00 Byte)
 _________________________________________________________________
 ```
-### 196_25_10
+
+This model achieved an accuracy exceeding 97.40% on the MNIST testing dataset, which contains 10,000 images.
+
+* 196_25_10
 ```
 Model: "model"
 _________________________________________________________________
@@ -113,7 +120,9 @@ Trainable params: 5185 (20.25 KB)
 Non-trainable params: 0 (0.00 Byte)
 _________________________________________________________________
 ```
-### 196_24_14_10
+This model achieved an accuracy exceeding 95.41% on the MNIST testing dataset
+
+* 196_24_14_10
 ```
 Model: "model"
 _________________________________________________________________
@@ -133,9 +142,16 @@ Trainable params: 5228 (20.42 KB)
 Non-trainable params: 0 (0.00 Byte)
 _________________________________________________________________
 ```
+This model achieved an accuracy exceeding 95.56% on the MNIST testing dataset
+
+
 
 ## CNN
-### 28_6_16_10_5
+Contrary to the DNN model, where the first element denotes the total input size, the naming convention for CNN models begins with a single dimension of the input shape, such as 28 or 14. This is followed by two Conv2D layers, each coupled with an AvgPooling2D layer to reduce spatial dimensions. After flattening, the network may include zero to two dense layers, culminating in an output dense layer designed for classification.
+
+### Specification
+
+* 28_6_16_10_5
 ```
 Model: "model"
 _________________________________________________________________
@@ -167,7 +183,9 @@ Trainable params: 5142 (20.09 KB)
 Non-trainable params: 0 (0.00 Byte)
 _________________________________________________________________
 ```
-### 14_5_11_80_10_3
+This model achieved an accuracy exceeding 98.66% on the MNIST testing dataset, which consists of 10,000 images.
+
+* 14_5_11_80_10_3
 ```
 Model: "model"
 _________________________________________________________________
@@ -203,7 +221,9 @@ Trainable params: 4966 (19.40 KB)
 Non-trainable params: 0 (0.00 Byte)
 _________________________________________________________________
 ```
-### 28_6_16_120_84_10_5
+This model achieved an accuracy exceeding 97.07 on the MNIST testing dataset
+
+* 28_6_16_120_84_10_5
 
 ```
 Model: "model"
@@ -235,7 +255,8 @@ _________________________________________________________________
  dense_1 (Dense)             (None, 84)                10164     
                                                                  
  re_lu_3 (ReLU)              (None, 84)                0         
-                                                                 
+                                                                fklfsjfi
+
  dense_2 (Dense)             (None, 10)                850       
                                                                  
 =================================================================
@@ -244,6 +265,7 @@ Trainable params: 44426 (173.54 KB)
 Non-trainable params: 0 (0.00 Byte)
 _________________________________________________________________
 ```
+This model achieved an accuracy exceeding 98.72 on the MNIST testing dataset
 
 > For some unknown reasons, using 'accuracy' mode for ezkl to benchmark on model '196_24_14_10' will crash the testing system since it requires more 128 GB memory. Therefore, we omit this testing set in our benchmark and will add this later when this bug has been fixed.
 
