@@ -73,7 +73,7 @@ The benchmarking process for evaluating zkML frameworks is designed to offer a t
 
 Through this detailed benchmarking process, we aim to provide a nuanced understanding of each zkML framework’s capabilities, especially in handling increasingly complex machine learning models. This approach will guide users in selecting the most suitable framework for their specific requirements in the realm of zkML.
 
-# Results
+# Architecture Overview
 Before delving into the benchmark results, let's enumerate the tested models.
 
 ## DNN
@@ -147,7 +147,7 @@ This model achieved an accuracy exceeding 95.56% on the MNIST testing dataset
 
 
 ## CNN
-Contrary to the DNN model, where the first element denotes the total input size, the naming convention for CNN models begins with a single dimension of the input shape, such as 28 or 14. This is followed by two Conv2D layers, each coupled with an AvgPooling2D layer to reduce spatial dimensions. After flattening, the network may include zero to two dense layers, culminating in an output dense layer designed for classification.
+CNN models differ significantly from DNN models, particularly in their initial approach, which begins with the input shape's dimensions. These models incorporate Conv2D and AvgPooling2D layers to reduce spatial dimensions before flattening. The naming convention for CNN models starts with the dimension of the input shape (e.g., 28 or 14), followed by the specifications for the Conv2D layers, optional dense layers, and concludes with the output layer designed for classification. The last value denotes the kernel size of the Conv2D layers. For instance, the CNN network '28_6_16_10_5' signifies an input size of 28x28, followed by two Conv2D layers with sizes 6 and 16, respectively. After the flatten layer processes the input from the previous layer (256), it outputs a 10-class inference. The '_5' at the end specifies that the Conv2D layers have a '5x5' kernel size.
 
 ### Specification
 
@@ -267,16 +267,27 @@ _________________________________________________________________
 ```
 This model achieved an accuracy exceeding 98.72 on the MNIST testing dataset
 
-> For some unknown reasons, using 'accuracy' mode for ezkl to benchmark on model '196_24_14_10' will crash the testing system since it requires more 128 GB memory. Therefore, we omit this testing set in our benchmark and will add this later when this bug has been fixed.
-
-## Increasing Layer
-![]
-
-## Increasing Parameter
 
 
-## Changing Layer
 
+# Results and Analysis
+In this benchmark, we utilized four primary metrics: accuracy loss, memory usage, proving time, and framework compatibility. Although the first three metrics can be quantified and compared with each other, a challenge remains in determining if one framework significantly outperforms another. For instance, a framework might achieve nearly zero accuracy loss but at the cost of impractical memory usage and proving time. To address this, we normalized the results of each framework tested on the same model and plotted these results using radar charts. This approach provides readers with a clearer understanding of each framework's performance across these three metrics.
+
+It's important to note that this methodology implies treating accuracy loss, memory usage, and proving time as equally important, which may not always be practical in real-world scenarios. Therefore, readers are also encouraged to consult the bar charts provided in subsequent sections. These charts are designed to help developers comprehend the trade-offs and performance differences among the various frameworks, offering a more nuanced view of each framework's strengths and weaknesses.
+
+## Performance on DNN Models
+
+![](../benchmarks/radar_chart/196_24_14_10.png)
+> For some unknown reasons, using 'accuracy' mode for ezkl to benchmark on model '196_24_14_10' will crash the testing system since it requires more than 128 GB memory. Therefore, we omit this testing set in our benchmark and will add this later when this bug has been fixed.
+
+![](../benchmarks/radar_chart/196_25_10.png)
+![](../benchmarks/radar_chart/784_56_10.png)
+
+## Performance on CNN Models
+
+![](../benchmarks/radar_chart/28_6_16_10_5.png)
+![](../benchmarks/radar_chart/14_5_11_80_10_3.png)
+![](../benchmarks/radar_chart/28_6_16_120_84_10_5.png)
 
 # Analysis
 
