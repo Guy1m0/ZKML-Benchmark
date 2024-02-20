@@ -43,7 +43,7 @@ Our benchmarking methodology involves tasks on the MNIST dataset for evaluating 
 * **MNIST Dataset:**
     - Simplicity of Task: The MNIST dataset, comprising handwritten digits, serves as a benchmark for assessing the basic capabilities of zkML frameworks.
     - Framework Assessment: This task will gauge how each framework manages simple image data in terms of maintaining accuracy and operational efficiency.
-    - Parameter Variation: We will test the frameworks on this dataset with an increasing number of parameters and layers, pushing the boundaries of each framework's capacity.
+    - Parameter Variation: I will test the frameworks on this dataset with an increasing number of parameters and layers, pushing the boundaries of each framework's capacity.
 
 
 ## Benchmarking Process
@@ -51,7 +51,7 @@ Our benchmarking methodology involves tasks on the MNIST dataset for evaluating 
 The benchmarking process for evaluating zkML frameworks is designed to offer a thorough analysis of their performance across various metrics. Below is a detailed outline of the steps involved.
 
 1. **Neural Network Design:** 
-    * We meticulously craft the structure of networks ranging from 3-layer DNNs to 6-layer CNNs. This is to assess each framework's ability to efficiently translate Multi-Layer Perceptrons (MLPs) into zk circuits, focusing on both the transpilation process and its efficiency.
+    * I meticulously craft the structure of networks ranging from 3-layer DNNs to 6-layer CNNs. This is to assess each framework's ability to efficiently translate Multi-Layer Perceptrons (MLPs) into zk circuits, focusing on both the transpilation process and its efficiency.
 
 2. **Uniform Testing Conditions:** 
     * Given the diversity in zkML framework compatibilities, with some frameworks exclusively supporting TensorFlow or PyTorch, establishing uniform testing conditions extends beyond merely standardizing the MLP structures. To facilitate direct and fair performance comparisons, a crucial step involves the unification of model representations across TensorFlow and PyTorch ecosystems. This harmonization ensures that the benchmarks accurately reflect each framework's capabilities under comparable conditions.
@@ -68,10 +68,8 @@ The benchmarking process for evaluating zkML frameworks is designed to offer a t
 5. **Highlight Differences:** 
     * We clearly delineate performance distinctions and capabilities across the various proving systems. This includes comprehensive insights on each system's response to diverse benchmarking tasks and conditions, especially with modified MLP architectures.
 
-6. **Framework-Specific Feature Evaluation:** 
-    * Unique or specialized features of each framework, such as the accuracy mode in zkML for precision or resource mode for efficiency, are thoroughly evaluated. This assessment aids in understanding how these features influence the framework's overall performance and utility.
 
-Through this detailed benchmarking process, we aim to provide a nuanced understanding of each zkML framework’s capabilities, especially in handling increasingly complex machine learning models. This approach will guide users in selecting the most suitable framework for their specific requirements in the realm of zkML.
+Through this detailed benchmarking process, this project aims to provide a nuanced understanding of each zkML framework’s capabilities, especially in handling increasingly complex machine learning models. This approach will guide users in selecting the most suitable framework for their specific requirements in the realm of zkML.
 
 # Architecture Overview
 Before delving into the benchmark results, let's review the tested models.
@@ -148,13 +146,15 @@ Each model was evaluated on the MNIST testing dataset, which includes 10,000 ima
 
 
 # Results and Analysis
-In this benchmark, we utilized four primary metrics: accuracy loss, memory usage, proving time, and framework compatibility. Although the first three metrics can be quantified and compared with each other, a challenge remains in determining if one framework significantly outperforms another. For instance, a framework might achieve nearly zero accuracy loss but at the cost of impractical memory usage and proving time. To address this, we normalized the results of each framework tested on the same model and plotted these results using radar charts. This approach provides readers with a clearer understanding of each framework's performance across these three metrics.
+This benchmark utilized four primary metrics: accuracy loss, memory usage, proving time, and framework compatibility. Although the first three metrics can be quantified and compared with each other, a challenge remains in determining if one framework significantly outperforms another. For instance, a framework might achieve nearly zero accuracy loss but at the cost of impractical memory usage and proving time. To address this, I normalized the results of each framework tested on the same model and plotted these results using radar charts. This approach provides readers with a clearer understanding of each framework's performance across these three metrics.
 
 It's important to note that this methodology implies treating accuracy loss, memory usage, and proving time as equally important, which may not always be practical in real-world scenarios. Therefore, readers are also encouraged to consult the bar charts provided in subsequent sections. These charts are designed to help developers comprehend the trade-offs and performance differences among the various frameworks, offering a more nuanced view of each framework's strengths and weaknesses.
 
 ## Performance on DNN & CNN Models
 
 We have used consistent colors to plot the performance of each framework across all six tested neural networks, with details provided in the legends. The results from the benchmarks have been normalized, with the best-performing framework in each metric scoring 1.0 on the radar chart. Therefore, the larger the area of the triangle formed by the normalized data on accuracy loss, memory usage, and proving time, the better the framework's performance.
+
+> Please ref to [link](https://github.com/Guy1m0/ZKML-Benchmark/blob/main/benchmarks/benchmark_results.csv) for the complete benchmark results.
 
 ### Performance on DNN Models
 
@@ -164,7 +164,7 @@ From the above three radar charts, it is evident that both opML and Circomlib-ML
 
 > **Note on EZKL:** EZKL offers two modes - 'accuracy,' which aims to minimize accuracy loss using a larger scaling factor, and 'resource,' which is optimized for resource-constrained systems, achieving acceptable accuracy loss with good efficiency.
 
-> **Caveat:** The 'accuracy' mode of EZKL, when benchmarked on the model '196_24_14_10', causes a system crash due to exceeding 128 GB memory requirements. We have excluded this test set from our benchmark and will include it in a future update once the issue is resolved.
+> **Caveat:** The 'accuracy' mode of EZKL, when benchmarked on the model '196_24_14_10', causes a system crash due to exceeding 128 GB memory requirements. I have excluded this test set from our benchmark and will include it in a future update once the issue is resolved.
 
 ### Performance on CNN Models
 
@@ -173,11 +173,30 @@ From the above three radar charts, it is evident that both opML and Circomlib-ML
 As opML currently does not support the Conv2d operator, only three frameworks are included in this set of benchmarks. The charts clearly indicate that EZKL, even in 'resource' mode, dominates this testing suite across all three metrics.
 
 ## Analysis on Key Factors
+To better understand the performance results on these 6 different models, a close examination of the impact of variations in structures on metrics like accuracy loss and memory usage has been conducted. Total 5 key factors have been chosen to test how this variation will lead to.
+
+### Numbers of Layers in DNN
+![](../benchmarks/bar_chart/num_layer-varying_dnn.png)
 
 
+### Numbers of Parameters in DNN
+![](../benchmarks/bar_chart/num_param-varying_dnn.png)
 
-## zkML Delemma
+### Adding Dense Layers in CNN
+![](../benchmarks/bar_chart/add-dense_cnn.png)
 
-## Layer VS Activition Func
+### Conv2D over Dense Layer
+![](../benchmarks/bar_chart/same-layer-param_cnn-dnn.png)
 
-## Sacling Factor
+### Others
+
+CNN to DNN
+
+![](../benchmarks/bar_chart/same-param_cnn-dnn.png)
+> Most complicated models
+
+![](../benchmarks/radar_chart/factors/same-param_cnn-dnn.png)
+
+
+# Summary
+
