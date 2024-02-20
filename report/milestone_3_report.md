@@ -74,200 +74,77 @@ The benchmarking process for evaluating zkML frameworks is designed to offer a t
 Through this detailed benchmarking process, we aim to provide a nuanced understanding of each zkML framework’s capabilities, especially in handling increasingly complex machine learning models. This approach will guide users in selecting the most suitable framework for their specific requirements in the realm of zkML.
 
 # Architecture Overview
-Before delving into the benchmark results, let's enumerate the tested models.
+Before delving into the benchmark results, let's review the tested models.
 
 ## DNN
-The initial testing network is comprised of Deep Neural Networks (DNN), each featuring an input layer followed by two or three fully connected dense layers. The nomenclature for each model is derived from the size of its layers, separated by underscores ('_'). For instance, the model named "784_56_10" signifies an input size of 784 (corresponding to MNIST dataset images, which are 28x28 pixels grayscale images), a subsequent dense layer with 56 units, and finally, an output layer designed to infer 10 distinct classes. Models "196_25_10" and "196_24_14_10" have their input size reduced from 28x28 to 14x14 pixels to evaluate the performance of the selected frameworks on DNNs with varying layers and parameters. Below are the specifics of each network outlined in the subsequent subsections.
+The initial testing network consists of Deep Neural Networks (DNN), each with an input layer followed by two or three fully connected dense layers. The nomenclature for each model is derived from the size of its layers, separated by underscores ('_').
 
-### Specification
+For example, the model named "784_56_10" denotes an input size of 784 (corresponding to MNIST dataset images, which are 28x28 pixels in grayscale), followed by a dense layer with 56 units, and ending with an output layer designed for 10 distinct classes. Models "196_25_10" and "196_24_14_10" are tested with reduced input sizes to evaluate performance across varying layers and parameters.
 
-* 784_56_10
-```
-Model: "model"
+The detailed structure for the model "784_56_10" is as follows:
+
+```plaintext
+Model: "784_56_10"
 _________________________________________________________________
- Layer (type)                Output Shape              Param #   
+Layer (type)                Output Shape              Param #   
 =================================================================
- input_1 (InputLayer)        [(None, 784)]             0         
-                                                                 
- dense (Dense)               (None, 56)                43960     
-                                                                  
- dense_1 (Dense)             (None, 10)                570       
-                                                                 
+input_1 (InputLayer)        [(None, 784)]             0         
+dense (Dense)               (None, 56)                43,960     
+dense_1 (Dense)             (None, 10)                570       
 =================================================================
-Total params: 44530 (173.95 KB)
-Trainable params: 44530 (173.95 KB)
+Total params: 44,530 (173.95 KB)
+Trainable params: 44,530 (173.95 KB)
 Non-trainable params: 0 (0.00 Byte)
 _________________________________________________________________
 ```
 
-This model achieved an accuracy exceeding 97.40% on the MNIST testing dataset, which contains 10,000 images.
+### Specifications
 
-* 196_25_10
-```
-Model: "model"
-_________________________________________________________________
- Layer (type)                Output Shape              Param #   
-=================================================================
- input_1 (InputLayer)        [(None, 196)]             0         
-                                                                 
- dense (Dense)               (None, 25)                4925      
-                                                                 
- dense_1 (Dense)             (None, 10)                260       
-                                                                 
-=================================================================
-Total params: 5185 (20.25 KB)
-Trainable params: 5185 (20.25 KB)
-Non-trainable params: 0 (0.00 Byte)
-_________________________________________________________________
-```
-This model achieved an accuracy exceeding 95.41% on the MNIST testing dataset
-
-* 196_24_14_10
-```
-Model: "model"
-_________________________________________________________________
- Layer (type)                Output Shape              Param #   
-=================================================================
- input_1 (InputLayer)        [(None, 196)]             0         
-                                                                 
- dense (Dense)               (None, 24)                4728      
-                                                                 
- dense_1 (Dense)             (None, 14)                350       
-                                                                 
- dense_2 (Dense)             (None, 10)                150       
-                                                                 
-=================================================================
-Total params: 5228 (20.42 KB)
-Trainable params: 5228 (20.42 KB)
-Non-trainable params: 0 (0.00 Byte)
-_________________________________________________________________
-```
-This model achieved an accuracy exceeding 95.56% on the MNIST testing dataset
-
-
+| Model         | Trainable Parameters | Accuracy on MNIST |
+|---------------|----------------------|-------------------|
+| `784_56_10`   | 44,530               | >97.40%           |
+| `196_25_10`   | 5,185                | >95.41%           |
+| `196_24_14_10`| 5,228                | >95.56%           |
 
 ## CNN
-CNN models differ significantly from DNN models, particularly in their initial approach, which begins with the input shape's dimensions. These models incorporate Conv2D and AvgPooling2D layers to reduce spatial dimensions before flattening. The naming convention for CNN models starts with the dimension of the input shape (e.g., 28 or 14), followed by the specifications for the Conv2D layers, optional dense layers, and concludes with the output layer designed for classification. The last value denotes the kernel size of the Conv2D layers. For instance, the CNN network '28_6_16_10_5' signifies an input size of 28x28, followed by two Conv2D layers with sizes 6 and 16, respectively. After the flatten layer processes the input from the previous layer (256), it outputs a 10-class inference. The '_5' at the end specifies that the Conv2D layers have a '5x5' kernel size.
+CNN models are fundamentally different from DNN models, starting with their initial approach that begins with the input shape's dimensions. These models employ Conv2D and AvgPooling2D layers to diminish spatial dimensions prior to flattening. The nomenclature for CNN models commences with a single dimension of the input shape, such as 28 or 14, followed by the specifications for the Conv2D layers, and concludes with the output layer designed for classification. The last value denotes the kernel size of the Conv2D layers.
 
-### Specification
+For instance, the CNN network '28_6_16_10_5' signifies an input size of 28x28, followed by two Conv2D layers with sizes 6 and 16, respectively. After the flatten layer processes the input from the previous layer (256), it outputs a 10-class inference. The '_5' at the end specifies that the Conv2D layers have a '5x5' kernel size.
 
-* 28_6_16_10_5
+Below is the detailed structure for the model '28_6_16_10_5':
+
 ```
-Model: "model"
+Model: "28_6_16_10_5"
 _________________________________________________________________
- Layer (type)                Output Shape              Param #   
+Layer (type)                Output Shape              Param #   
 =================================================================
- input_1 (InputLayer)       [(None, 28, 28, 1)]       0         
-                                                                 
- conv2d (Conv2D)            (None, 24, 24, 6)         156       
-                                                                 
- re_lu (ReLU)               (None, 24, 24, 6)         0         
-                                                                 
- average_pooling2d (Aver    (None, 12, 12, 6)         0         
- agePooling2D)                                                   
-                                                                 
- conv2d_1 (Conv2D)          (None, 8, 8, 16)          2416      
-                                                                 
- re_lu_1 (ReLU)             (None, 8, 8, 16)          0         
-                                                                 
- average_pooling2d_1 (Aver  (None, 4, 4, 16)          0         
- agePooling2D)                                                   
-                                                                 
- flatten (Flatten)          (None, 256)               0         
-                                                                 
- dense (Dense)              (None, 10)                2570      
-                                                                 
+input_1 (InputLayer)        [(None, 28, 28, 1)]       0         
+conv2d (Conv2D)             (None, 24, 24, 6)         156       
+re_lu (ReLU)                (None, 24, 24, 6)         0         
+average_pooling2d (AveragePooling2D) (None, 12, 12, 6) 0         
+conv2d_1 (Conv2D)           (None, 8, 8, 16)          2416      
+re_lu_1 (ReLU)              (None, 8, 8, 16)          0         
+average_pooling2d_1 (AveragePooling2D) (None, 4, 4, 16) 0         
+flatten (Flatten)           (None, 256)               0         
+dense (Dense)               (None, 10)                2570      
 =================================================================
-Total params: 5142 (20.09 KB)
-Trainable params: 5142 (20.09 KB)
+Total params: 5,142 (20.09 KB)
+Trainable params: 5,142 (20.09 KB)
 Non-trainable params: 0 (0.00 Byte)
 _________________________________________________________________
 ```
-This model achieved an accuracy exceeding 98.66% on the MNIST testing dataset, which consists of 10,000 images.
 
-* 14_5_11_80_10_3
-```
-Model: "model"
-_________________________________________________________________
- Layer (type)                Output Shape              Param #   
-=================================================================
- input_4 (InputLayer)        [(None, 14, 14, 1)]       0         
-                                                                 
- conv2d_10 (Conv2D)          (None, 12, 12, 5)         50        
-                                                                 
- re_lu_6 (ReLU)              (None, 12, 12, 5)         0         
-                                                                 
- average_pooling2d_10 (Aver  (None, 6, 6, 5)           0         
- agePooling2D)                                                   
-                                                                 
- conv2d_11 (Conv2D)          (None, 4, 4, 11)          506       
-                                                                 
- re_lu_7 (ReLU)              (None, 4, 4, 11)          0         
-                                                                 
- average_pooling2d_11 (Aver  (None, 2, 2, 11)          0         
- agePooling2D)                                                   
-                                                                 
- flatten_5 (Flatten)         (None, 44)                0         
-                                                                 
- dense_15 (Dense)            (None, 80)                3600      
-                                                                 
- re_lu_8 (ReLU)              (None, 80)                0         
-                                                                 
- dense_16 (Dense)            (None, 10)                810       
-                                                                 
-=================================================================
-Total params: 4966 (19.40 KB)
-Trainable params: 4966 (19.40 KB)
-Non-trainable params: 0 (0.00 Byte)
-_________________________________________________________________
-```
-This model achieved an accuracy exceeding 97.07 on the MNIST testing dataset
+### Specifications
 
-* 28_6_16_120_84_10_5
+The following table outlines the specific details and performance metrics of each CNN model tested:
 
-```
-Model: "model"
-_________________________________________________________________
- Layer (type)                Output Shape              Param #   
-=================================================================
- input_1 (InputLayer)        [(None, 28, 28, 1)]       0         
-                                                                 
- conv2d (Conv2D)             (None, 24, 24, 6)         156       
-                                                                 
- re_lu (ReLU)                (None, 24, 24, 6)         0         
-                                                                 
- average_pooling2d (Average  (None, 12, 12, 6)         0         
- Pooling2D)                                                      
-                                                                 
- conv2d_1 (Conv2D)           (None, 8, 8, 16)          2416      
-                                                                 
- re_lu_1 (ReLU)              (None, 8, 8, 16)          0         
-                                                                 
- average_pooling2d_1 (Avera  (None, 4, 4, 16)          0         
- gePooling2D)                                                    
-                                                                 
- flatten (Flatten)           (None, 256)               0         
-                                                                 
- dense (Dense)               (None, 120)               30840     
-                                                                 
- re_lu_2 (ReLU)              (None, 120)               0         
-                                                                 
- dense_1 (Dense)             (None, 84)                10164     
-                                                                 
- re_lu_3 (ReLU)              (None, 84)                0         
-                                                                fklfsjfi
+| Model                 | Trainable Parameters | Accuracy on MNIST |
+| --------------------- | -------------------- | ----------------- |
+| `28_6_16_10_5`        | 5,142                | >98.66%           |
+| `14_5_11_80_10_3`     | 4,966                | >97.07%           |
+| `28_6_16_120_84_10_5` | 44,426               | >98.72%           |
 
- dense_2 (Dense)             (None, 10)                850       
-                                                                 
-=================================================================
-Total params: 44426 (173.54 KB)
-Trainable params: 44426 (173.54 KB)
-Non-trainable params: 0 (0.00 Byte)
-_________________________________________________________________
-```
-This model achieved an accuracy exceeding 98.72 on the MNIST testing dataset
-
-
+Each model was evaluated on the MNIST testing dataset, which includes 10,000 images, to determine its accuracy.
 
 
 # Results and Analysis
@@ -275,21 +152,29 @@ In this benchmark, we utilized four primary metrics: accuracy loss, memory usage
 
 It's important to note that this methodology implies treating accuracy loss, memory usage, and proving time as equally important, which may not always be practical in real-world scenarios. Therefore, readers are also encouraged to consult the bar charts provided in subsequent sections. These charts are designed to help developers comprehend the trade-offs and performance differences among the various frameworks, offering a more nuanced view of each framework's strengths and weaknesses.
 
-## Performance on DNN Models
+## Performance on DNN & CNN Models
 
-![](../benchmarks/radar_chart/196_24_14_10.png)
-> For some unknown reasons, using 'accuracy' mode for ezkl to benchmark on model '196_24_14_10' will crash the testing system since it requires more than 128 GB memory. Therefore, we omit this testing set in our benchmark and will add this later when this bug has been fixed.
+We have used consistent colors to plot the performance of each framework across all six tested neural networks, with details provided in the legends. The results from the benchmarks have been normalized, with the best-performing framework in each metric scoring 1.0 on the radar chart. Therefore, the larger the area of the triangle formed by the normalized data on accuracy loss, memory usage, and proving time, the better the framework's performance.
 
-![](../benchmarks/radar_chart/196_25_10.png)
-![](../benchmarks/radar_chart/784_56_10.png)
+### Performance on DNN Models
 
-## Performance on CNN Models
+![](../benchmarks/radar_chart/3_dnn_models.png)
 
-![](../benchmarks/radar_chart/28_6_16_10_5.png)
-![](../benchmarks/radar_chart/14_5_11_80_10_3.png)
-![](../benchmarks/radar_chart/28_6_16_120_84_10_5.png)
+From the above three radar charts, it is evident that both opML and Circomlib-ML stand out in the benchmarks. opML prioritizes proving time and memory usage without sacrificing much accuracy, while Circomlib-ML offers the best accuracy loss with acceptable proving time and memory usage for generating proofs in zkML.
 
-# Analysis
+> **Note on EZKL:** EZKL offers two modes - 'accuracy,' which aims to minimize accuracy loss using a larger scaling factor, and 'resource,' which is optimized for resource-constrained systems, achieving acceptable accuracy loss with good efficiency.
+
+> **Caveat:** The 'accuracy' mode of EZKL, when benchmarked on the model '196_24_14_10', causes a system crash due to exceeding 128 GB memory requirements. We have excluded this test set from our benchmark and will include it in a future update once the issue is resolved.
+
+### Performance on CNN Models
+
+![](../benchmarks/radar_chart/3_cnn_models.png)
+
+As opML currently does not support the Conv2d operator, only three frameworks are included in this set of benchmarks. The charts clearly indicate that EZKL, even in 'resource' mode, dominates this testing suite across all three metrics.
+
+## Analysis on Key Factors
+
+
 
 ## zkML Delemma
 
