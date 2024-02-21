@@ -12,6 +12,7 @@ tensorflow==2.15.0
 matplotlib==3.8.2
 
 pandas == 2.2.0
+pyarrow==15.0.0
 
 # Hyper Oracl
 rangetree==1.0
