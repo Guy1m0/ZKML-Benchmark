@@ -3,10 +3,10 @@ import re, os, argparse, sys
 import concurrent.futures, subprocess, threading, time
 
 folders = {
-    'opml': "../frameworks/hyper_oracle/",
-    'kang': "../frameworks/ddkang/",
+    'opml': "../frameworks/opML/",
+    'kang': "../frameworks/zkml/",
     'ezkl': "../frameworks/ezkl/",
-    'cathie': "../frameworks/socathie"
+    'cathie': "../frameworks/circomlib-ml"
 }
 
 def multi_tasks(folder, models_list, size, start):
