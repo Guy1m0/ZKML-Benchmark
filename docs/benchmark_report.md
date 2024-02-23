@@ -13,17 +13,17 @@ Unlike the existing benchmark [results](https://blog.ezkl.xyz/post/benchmarks/) 
 
 # Benchmark Overview
 
-This project has executed extensive testing over several months, evaluating 4 leading zkML frameworks against **6 different DNN and CNN architectures**. Through meticulous analysis of each framework across **2500 datasets**, we have invested **over 250 hours** in setup and proof generation. The exhaustive results for each configuration are meticulously documented, providing a comprehensive resource for comparison.
+This project has executed extensive testing over several months, evaluating 4 leading zkML frameworks against **6 different DNN and CNN architectures**. Through meticulous analysis of each framework across **2500 datasets**, we have invested **over 250 hours** in setup and proof generation. The exhaustive results for each configuration are meticulously documented in the [csv](https://github.com/Guy1m0/ZKML-Benchmark/blob/main/benchmarks/benchmark_results.csv), providing a comprehensive resource for comparison.
 
 For example, the '784_56_10' DNN model begins with an input size of 784, progresses through a dense layer of 56 units, and concludes with a 10-class output. This model, among others, was tested to understand the frameworks' efficiency and effectiveness. The following table provides a snapshot of the benchmark results:
 
-| Framework               | Accuracy Loss (%) | Avg Memory Usage (MB) | Std Memory Usage | Avg Proving Time (s) | Std Proving Time | Notes                                     |
-|-------------------------|-------------------|-----------------------|------------------|----------------------|------------------|-------------------------------------------|
-| circomlib-ml (tensorflow) | 0.04              | 2328.32               | 34.44            | 2.35                  | 0.15             | non-linear constraints: 73416           |
-| ezkl (pytorch)          | 0.00              | 4807.18               | 1719.09          | 38.01                 | 14.24            | mode=accuracy \| Combined 0-2500       |
-| ezkl (pytorch)          | 6.40              | 220.90                | 3.85             | 2.66                  | 0.79             | mode=resources                          |
-| opml (pytorch)          | 0.72              | 89.12                 | 2.25             | 3.61                  | 0.42             |                                           |
-| zkml (tensorflow)       | 0.00              | 2355.05               | 11.75            | 21.73                 | 0.32             | Combined 0-2500                          |
+| Framework                | Accuracy Loss (%) | Avg Memory Usage (MB) | Std Memory Usage | Avg Proving Time (s) | Std Proving Time | Notes                                     |
+|--------------------------|-------------------|-----------------------|------------------|----------------------|------------------|-------------------------------------------|
+| circomlib-ml (tensorflow)| 0.04              | 2328.32               | 34.44            | 2.35                 | 0.15             | non-linear constraints: 73416           |
+| ezkl (pytorch)           | 0.00              | 4807.18               | 1719.09          | 38.01                | 14.24            | mode=accuracy \| Combined 0-2500       |
+| ezkl (pytorch)           | 6.40              | 220.90                | 3.85             | 2.66                 | 0.79             | mode=resources                          |
+| opml (pytorch)           | 0.72              | 89.12                 | 2.25             | 3.61                 | 0.42             |                                           |
+| zkml (tensorflow)        | 0.00              | 2355.05               | 11.75            | 21.73                | 0.32             | Combined 0-2500                          |
 
 ## Primary Metrics
 
@@ -33,14 +33,11 @@ For example, the '784_56_10' DNN model begins with an input size of 784, progres
 
 * **Proving Time:** The time required by each framework to generate a proof, essential for gauging the proof system's efficiency. Note: Proof verification time is considered beyond the scope of this analysis.
 
-**Note:** In above table, "Std Proving Time" and "Std Memory Usage" represent the standard deviation of time taken to generate proofs and memory used during tests, respectively, offering insights into the efficiency and consistency of each framework.
+**Note:** In the above table, "Std Proving Time" and "Std Memory Usage" represent the standard deviation of time taken to generate proofs and memory used during tests, respectively, offering insights into the efficiency and consistency of each framework.
 
 # Benchmark Methodology
 
 The methodology for benchmarking zkML frameworks is meticulously designed to evaluate and compare the performance and capabilities of various zk proof systems for verifiable inference. 
-
-
-<!-- * **Framework Compatibility:** Assesses each framework's ability to work with various ML model formats and operators. -->
 
 ## Selected Frameworks:
 
@@ -51,7 +48,9 @@ The methodology for benchmarking zkML frameworks is meticulously designed to eva
 
 These frameworks were selected based on criteria such as GitHub popularity, the proof system used, and support for different ML model formats. This variety ensures a broad analysis across distinct zk proof systems.
 
-> Note on Orion Exclusion: The proof generation process for Orion, developed by Gizatech, is executed on the Giza platform. Due to this, the memory usage and time cost metrics during proof generation are not directly comparable with those of other frameworks evaluated in this project. As a result, to maintain the integrity and comparability of our benchmarking analysis, Orion's benchmark results will be excluded from the subsequent sections.
+> Orion Exclusion: The proof generation process for Orion, developed by Gizatech, is executed on the Giza platform. Due to this, the memory usage and time cost metrics during proof generation are not directly comparable with those of other frameworks evaluated in this project. As a result, to maintain the integrity and comparability of our benchmarking analysis, Orion's benchmark results will be excluded from the subsequent sections.
+
+**Note on opML:** opML's approach to machine learning inference differs from that of the other zkML frameworks in this benchmark. Typically, zkML processes involve the computation of ML inference followed by the generation of zk proofs for such inferences, culminating in a verifiable zkML proof. In contrast, opML focuses on executing ML inference within a virtual machine and outputs a Merkle root that represents the VM state. This Merkle root serves as a commitment to the computed state, and a fraud proof is only generated if this commitment is challenged. Thus, the benchmarked computation costs for opML —memory usage and proving time— are reflective of running the ML model within the VM environment and not of generating any proofs. It is important to consider this distinction when comparing opML's computation costs to those of complete zkML solutions, as a direct comparison may not accurately represent the resource and time efficiency of the different frameworks.
 
 ## Benchmarking Design
 Our benchmarking involves tasks on the MNIST dataset for evaluating frameworks under varying complexity levels:
