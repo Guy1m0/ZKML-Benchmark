@@ -30,4 +30,4 @@ It is worth noting that the argments needed for each frameworks may vary. Theref
 python benchmark.py -h
 ```
 
-> For frameworks proposed by hyper_oracle and  so_cathie, please first run the setup bash code
+> For frameworks proposed by hyper_oracle and so_cathie, please first run the setup bash code
