@@ -1,6 +1,6 @@
 ZKML Benchmarking
 ===
-> Disclaimer:
+> **Disclaimer**: The benchmark settings for each framework have been determined solely based on my interpretation of their respective documentation and codebases. It is possible that misinterpretations have occurred, potentially leading to suboptimal environment configurations, improper testing data preprocessing, or incorrect parameter selection. Consequently, these factors may have influenced the accuracy of the benchmark results. If you detect any such errors or unexpected results, please do not hesitate to contact me via my Telegram account @Guy1m0. I am eager to address any inaccuracies to ensure the benchmarks presented are as reliable and comprehensive as possible. 
 
 # Introduction
 
