@@ -1,5 +1,4 @@
-> Disclaimer
-
+> **Disclaimer**: The benchmark settings for each framework have been determined solely based on my interpretation of their respective documentation and codebases. It is possible that misinterpretations have occurred, potentially leading to suboptimal environment configurations, improper testing data preprocessing, or incorrect parameter selection. Consequently, these factors may have influenced the accuracy of the benchmark results. If you detect any such errors or unexpected results, please do not hesitate to contact me via my Telegram account @Guy1m0. I am eager to address any inaccuracies to ensure the benchmarks presented are as reliable and comprehensive as possible. 
 
 # Introduction
 
@@ -22,7 +21,7 @@ For example, the '784_56_10' DNN model begins with an input size of 784, progres
 | circomlib-ml (tensorflow)| 0.04              | 2328.32               | 34.44            | 2.35                 | 0.15             | non-linear constraints: 73416           |
 | ezkl (pytorch)           | 0.00              | 4807.18               | 1719.09          | 38.01                | 14.24            | mode=accuracy \| Combined 0-2500       |
 | ezkl (pytorch)           | 6.40              | 220.90                | 3.85             | 2.66                 | 0.79             | mode=resources                          |
-| opml (pytorch)           | 0.72              | 89.12                 | 2.25             | 3.61                 | 0.42             |                                           |
+| opml (pytorch)           | 0.00              | 89.32                 | 2.47             | 3.60                 | 0.43             |                                           |
 | zkml (tensorflow)        | 0.00              | 2355.05               | 11.75            | 21.73                | 0.32             | Combined 0-2500                          |
 
 ## Primary Metrics
@@ -49,8 +48,6 @@ The methodology for benchmarking zkML frameworks is meticulously designed to eva
 These frameworks were selected based on criteria such as GitHub popularity, the proof system used, and support for different ML model formats. This variety ensures a broad analysis across distinct zk proof systems.
 
 > Orion Exclusion: The proof generation process for Orion, developed by Gizatech, is executed on the Giza platform. Due to this, the memory usage and time cost metrics during proof generation are not directly comparable with those of other frameworks evaluated in this project. As a result, to maintain the integrity and comparability of our benchmarking analysis, Orion's benchmark results will be excluded from the subsequent sections.
-
-**Note on opML:** opML's approach to machine learning inference differs from that of the other zkML frameworks in this benchmark. Typically, zkML processes involve the computation of ML inference followed by the generation of zk proofs for such inferences, culminating in a verifiable zkML proof. In contrast, opML focuses on executing ML inference within a virtual machine and outputs a Merkle root that represents the VM state. This Merkle root serves as a commitment to the computed state, and a fraud proof is only generated if this commitment is challenged. Thus, the benchmarked computation costs for opML —memory usage and proving time— are reflective of running the ML model within the VM environment and not of generating any proofs. It is important to consider this distinction when comparing opML's computation costs to those of complete zkML solutions, as a direct comparison may not accurately represent the resource and time efficiency of the different frameworks.
 
 ## Benchmarking Design
 Our benchmarking involves tasks on the MNIST dataset for evaluating frameworks under varying complexity levels:
@@ -173,16 +170,33 @@ It's important to note that this methodology implies treating accuracy loss, mem
 
 
 ## Performance on DNN Models
+In the bar charts below, we present the performance outcomes for each framework across various DNN models, spanning three metrics.
+
+![](../benchmarks/bar_chart/dnn_comparisons.png)
+
+Subsequently, we've normalized these results, as depicted in the radar charts. It's apparent that Circomlib-ML distinguishes itself in the benchmarks, striking a balance between accuracy loss, proving time, and memory usage—critical factors for generating proofs in zkML applications.
 
 ![](../benchmarks/radar_chart/3_dnn_models.png)
+**Note on EZKL:** EZKL offers two modes - 'accuracy,' which aims to minimize accuracy loss using a larger scaling factor, and 'resource,' which is optimized for resource-constrained systems, achieving acceptable accuracy loss with good efficiency.The 'accuracy' mode of EZKL, when benchmarked on the model '196_24_14_10', causes a system crash due to exceeding 128 GB memory requirements. we have excluded this test set from our benchmark and will include it in a future update once the issue is resolved.
 
-From the above three radar charts, it is evident that both opML and Circomlib-ML stand out in the benchmarks. opML prioritizes proving time and memory usage without sacrificing much accuracy, while Circomlib-ML offers the best accuracy loss with acceptable proving time and memory usage for generating proofs in zkML.
+Below is a tabulation of opML's performance metrics on DNN models:
 
-**Note:** EZKL offers two modes - 'accuracy,' which aims to minimize accuracy loss using a larger scaling factor, and 'resource,' which is optimized for resource-constrained systems, achieving acceptable accuracy loss with good efficiency.
+| Architecture                     | Accuracy Loss (%) | Avg Memory Usage (MB) | Std Memory Usage | Avg Proving Time (s) | Std Proving Time |
+|----------------------------------|-------------------|-----------------------|------------------|----------------------|------------------|
+| input-dense-dense (196x25x10)    | 0.00              | 70.88                 | 2.09             | 0.86                 | 0.08             |
+| Input-Dense-Dense (784x56x10)    | 0.00              | 87.32                 | 2.47             | 3.60                 | 0.43             |
+| input-dense-dense-dense (196x24x14x10) | 0.04 | 69.92 | 1.69 | 0.85 | 0.07 |
 
-> **Caveat:** The 'accuracy' mode of EZKL, when benchmarked on the model '196_24_14_10', causes a system crash due to exceeding 128 GB memory requirements. I have excluded this test set from our benchmark and will include it in a future update once the issue is resolved.
+**Note on opML:** opML's approach to machine learning inference differs from that of the other zkML frameworks in this benchmark. Typically, zkML processes involve the computation of ML inference followed by the generation of zk proofs for such inferences, culminating in a verifiable zkML proof. In contrast, opML focuses on executing ML inference within a virtual machine and outputs a Merkle root that represents the VM state. This Merkle root serves as a commitment to the computed state, and **a fraud proof is only generated if this commitment is challenged**. Thus, the benchmarked computation costs for opML —memory usage and proving time— are reflective of running the ML model within the VM environment and not of generating any proofs. 
+
+Given this fundamental difference, the opML results are listed separately to ensure an accurate representation of resource and time efficiency across the frameworks.
 
 ## Performance on CNN Models
+In the bar charts below, we present the performance outcomes for each framework across various DNN models, spanning three metrics.
+
+![](../benchmarks/bar_chart/cnn_comparisons.png)
+
+Subsequently, we've normalized these results, as depicted in the radar charts. As opML currently does not support the Conv2d operator, only three frameworks are included in this set of benchmarks. The charts clearly indicate that EZKL, even in 'resource' mode, dominates this testing suite across all three metrics.
 
 ![](../benchmarks/radar_chart/3_cnn_models.png)
 
@@ -264,7 +278,7 @@ Throughout this comprehensive benchmarking effort, we rigorously evaluated four 
 
 A principal discovery is the marked divergence in performance between two zk systems, zk-SNARKs and Halo2, particularly in their handling of neural networks. Circomlib-ml's approach to transpiling 'Conv2d' operators into circom incurs significant resource demands, contrasting with ezkl and zkml that were more influenced by variations in the number of layers and network parameters.
 
-Furthermore, the fraud-proof system underpinning the opML framework demonstrated considerable promise in image classification tasks. Despite current limitations in operator support, the framework's performance on DNN models suggests it could be a viable alternative to traditional zkML frameworks. This is especially the case for applications where a degree of accuracy loss is acceptable and the assurance of any-trust: a single honest validator can enforce correct behavior—is sufficient.
+Furthermore, the fraud-proof system underpinning the opML framework demonstrated considerable promise in image classification tasks. Despite current limitations in operator support, the framework's performance on DNN models suggests it could be a viable alternative to traditional zkML frameworks. This is especially the case for applications that the assurance of any-trust: a single honest validator can enforce correct behavior—is sufficient.
 
 A critical aspect not examined in this benchmark is the scaling factor's influence on accuracy loss. Default settings were used for each framework:
 
